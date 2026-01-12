@@ -1,7 +1,5 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
   <div class="container">
@@ -12,10 +10,18 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item"><a class="nav-link" href="index.php">🏠 Accueil</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.php">✉️ Contact</a></li>
         
         <?php if (isset($_SESSION['user_id'])): ?>
-            <li class="nav-item"><a class="nav-link" href="admin_dashboard.php">⚙️ Gestion</a></li>
-            <li class="nav-item"><a class="nav-link text-warning" href="logout.php">Déconnexion</a></li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">⚙️ Gestion</a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="admin_dashboard.php">Gérer les événements</a></li>
+                    <li><a class="dropdown-item" href="admin_messages.php">Voir les messages</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="logout.php">Déconnexion</a></li>
+                </ul>
+            </li>
         <?php else: ?>
             <li class="nav-item"><a class="nav-link" href="login.php">🔒 Connexion</a></li>
         <?php endif; ?>
