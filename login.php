@@ -18,16 +18,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <title>Connexion</title>
+    <style>body { transition: background-color 0.5s; }</style>
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center" style="height: 100vh;">
+<body class="bg-body-tertiary d-flex align-items-center justify-content-center" style="height: 100vh;">
     <div class="card shadow p-4" style="max-width: 400px; width: 100%;">
-        <h3 class="text-center mb-4">Espace Admin</h3>
+        <div class="text-center mb-4">
+             <img src="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" width="50" class="mb-3">
+             <h3>Espace Admin</h3>
+        </div>
         <?= $message ?>
         <form method="POST">
             <div class="mb-3"><label>Identifiant</label><input type="text" name="identifiant" class="form-control" required></div>
@@ -36,5 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
         <div class="text-center mt-3"><a href="index.php">Retour au site</a></div>
     </div>
+    
+    <script src="script_theme.js"></script>
 </body>
 </html>
