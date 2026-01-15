@@ -30,9 +30,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $_POST
         <div class="row align-items-center">
             <div class="col-lg-6" data-aos="fade-right">
                 <h1 class="fw-bold mb-4">Rejoignez l'aventure !</h1>
-                <p class="lead mb-4">Donnez du sens à votre temps libre dans une ambiance conviviale.</p>
                 
-                <h5 class="fw-bold mt-4">Nos besoins actuels :</h5>
+                <p class="lead">
+                    Devenir bénévole au sein de notre association, c'est choisir de consacrer un peu de son temps pour faire une grande différence dans la vie du quartier.
+                </p>
+                <p>
+                    Que vous soyez étudiant, actif ou retraité, votre expérience est une richesse. Nous ne recherchons pas des experts, mais des personnes motivées, prêtes à transmettre un savoir, à encadrer une sortie ou simplement à offrir une oreille attentive.
+                </p>
+                <p class="mb-4">
+                    En nous rejoignant, vous participez activement à la vie de Noisy-le-Sec et vous vivez des moments de convivialité uniques avec une équipe soudée.
+                </p>
+                
+                <h5 class="fw-bold mt-4 border-top pt-3">Nos besoins actuels :</h5>
                 <ul class="list-group list-group-flush bg-transparent">
                     <li class="list-group-item bg-transparent">📚 Aide aux devoirs (16h30-18h)</li>
                     <li class="list-group-item bg-transparent">💻 Atelier Informatique</li>

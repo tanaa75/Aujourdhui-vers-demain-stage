@@ -4,14 +4,12 @@ $inscription_ok = false;
 
 // TRAITEMENT DU FORMULAIRE AIDE AUX DEVOIRS
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $_POST['form_type'] == 'devoirs') {
-    // On combine les infos pour les mettre dans le message
     $nom = $_POST['nom'];
     $prenom = $_POST['prenom'];
     $classe = $_POST['classe'];
     $tel = $_POST['tel'];
     $message_complet = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel";
     
-    // On l'enregistre dans la table 'messages' pour que l'admin le voie
     $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
     $stmt->execute(["Parent de $prenom", "Non renseigné", $message_complet]);
     $inscription_ok = true;
@@ -38,12 +36,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $_POST
                 <div class="card shadow border-0 h-100">
                     <div class="card-body p-4">
                         <h3 class="fw-bold text-warning mb-3">✏️ L’Aide aux Devoirs</h3>
-                        <p class="lead">Pour les enfants de 6 à 12 ans (École Primaire).</p>
-                        <ul class="list-unstyled">
+                        
+                        <p class="text-muted">
+                            L'aide aux devoirs chez <strong>Aujourd'hui vers Demain</strong>, c'est bien plus qu'une simple étude surveillée. C'est un espace bienveillant où chaque enfant de primaire bénéficie d'une attention particulière pour surmonter ses difficultés.
+                        </p>
+                        <p class="text-muted">
+                            Nos bénévoles ne se contentent pas de vérifier que les exercices sont faits ; ils transmettent des méthodes de travail, encouragent la curiosité et redonnent confiance aux élèves. C’est un moment de transition douce entre l’école et la maison.
+                        </p>
+                        
+                        <hr>
+
+                        <ul class="list-unstyled mt-3">
                             <li class="mb-2">📅 <strong>Quand ?</strong> Lundi, Mardi, Jeudi, Vendredi</li>
                             <li class="mb-2">🕒 <strong>Heure ?</strong> De 16h30 à 18h00</li>
-                            <li class="mb-2">👩‍🏫 <strong>Quoi ?</strong> Un temps calme accompagné d'un adulte.</li>
-                            <li>📖 <strong>Plus :</strong> Cours de français disponibles.</li>
+                            <li class="mb-2">👩‍🏫 <strong>Pour qui ?</strong> Enfants du CP au CM2 (6-12 ans)</li>
+                            <li>📖 <strong>Plus :</strong> Cours de français disponibles sur demande.</li>
                         </ul>
                     </div>
                 </div>
