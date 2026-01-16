@@ -3,40 +3,73 @@ require_once 'db.php';
 
 // --- 1. LOGIQUE DE TRAITEMENT DES FORMULAIRES ---
 
-// A. Variables de confirmation
 $inscription_ok = false;
 $benevole_ok = false;
+$error_msg = "";
 
-// B. Traitement général des POST
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type'])) {
     
-    // Cas 1 : Inscription Aide aux Devoirs
+    // --- CAS 1 : INSCRIPTION AIDE AUX DEVOIRS ---
     if ($_POST['form_type'] == 'devoirs') {
         $nom = $_POST['nom'];
         $prenom = $_POST['prenom'];
         $classe = $_POST['classe'];
         $tel = $_POST['tel'];
-        $msg_complet = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel";
+        $email = $_POST['email']; // Champ Email du parent
+        
+        $msg_complet = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel\nEmail parent : $email";
         
         $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
-        $stmt->execute(["Parent de $prenom", "Non renseigné", $msg_complet]);
+        $stmt->execute(["Parent de $prenom", $email, $msg_complet]);
         $inscription_ok = true;
     }
 
-    // Cas 2 : Candidature Bénévolat
+    // --- CAS 2 : CANDIDATURE BÉNÉVOLAT (Avec CV) ---
     if ($_POST['form_type'] == 'benevolat') {
         $nom = $_POST['nom'];
+        $email = $_POST['email'];
+        $tel = $_POST['tel'];
         $dispo = $_POST['dispo'];
         $skills = $_POST['skills'];
-        $msg_complet = "❤️ NOUVEAU BÉNÉVOLE !\nNom : $nom\nDispos : $dispo\nAime faire : $skills";
         
-        $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
-        $stmt->execute([$nom, "Benevole", $msg_complet]);
-        $benevole_ok = true;
+        // Gestion du CV (Upload)
+        $lien_cv = "Aucun CV fourni";
+        
+        if (isset($_FILES['cv']) && $_FILES['cv']['error'] == 0) {
+            // 1. Vérifier la taille (5 Mo max)
+            if ($_FILES['cv']['size'] <= 5000000) {
+                // 2. Vérifier l'extension
+                $fileInfo = pathinfo($_FILES['cv']['name']);
+                $extension = strtolower($fileInfo['extension']);
+                $allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'png'];
+                
+                if (in_array($extension, $allowedExtensions)) {
+                    // 3. Sauvegarder le fichier
+                    // On renomme le fichier pour éviter les doublons (ex: cv_nom_timestamp.pdf)
+                    $new_filename = 'cv_' . preg_replace('/[^a-zA-Z0-9]/', '', $nom) . '_' . time() . '.' . $extension;
+                    move_uploaded_file($_FILES['cv']['tmp_name'], 'uploads/' . $new_filename);
+                    
+                    // On crée le lien pour l'admin
+                    $lien_cv = "📄 TÉLÉCHARGER LE CV : http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/uploads/" . $new_filename;
+                } else {
+                    $error_msg = "Format de fichier non supporté (PDF, Word ou Image seulement).";
+                }
+            } else {
+                $error_msg = "Le fichier est trop lourd (Max 5 Mo).";
+            }
+        }
+
+        if (empty($error_msg)) {
+            $msg_complet = "❤️ NOUVEAU BÉNÉVOLE !\n\nNom : $nom\nEmail : $email\nTéléphone : $tel\n\nDispos : $dispo\nAime faire : $skills\n\n$lien_cv";
+            
+            $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
+            $stmt->execute([$nom, $email, $msg_complet]);
+            $benevole_ok = true;
+        }
     }
 }
 
-// --- 2. LOGIQUE DE RECHERCHE D'ÉVÉNEMENTS ---
+// --- 2. LOGIQUE DE RECHERCHE ---
 $search = "";
 if (isset($_GET['search']) && !empty($_GET['search'])) {
     $search = trim($_GET['search']);
@@ -64,7 +97,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
     <style>
         body { transition: background-color 0.5s, color 0.5s; }
         
-        /* HERO BANNER */
         .hero-banner {
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
@@ -75,7 +107,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             margin-bottom: 0;
         }
         
-        /* CHIFFRES CLES */
         .key-figures {
             background-color: #ffc107;
             color: #212529;
@@ -83,7 +114,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             font-weight: bold;
         }
         
-        /* CARTES EVENEMENTS */
         .card-event { transition: all 0.4s ease; cursor: pointer; border-radius: 15px; overflow: hidden; }
         .card-event:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important; }
     </style>
@@ -142,7 +172,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                     <div class="card-body p-4">
                         <h3 class="fw-bold text-warning mb-3">✏️ L’Aide aux Devoirs</h3>
                         <p class="text-muted">L'aide aux devoirs chez <strong>Aujourd'hui vers Demain</strong>, c'est bien plus qu'une simple étude surveillée. C'est un espace bienveillant où chaque enfant de primaire bénéficie d'une attention particulière.</p>
-                        <p class="text-muted">Nos bénévoles transmettent des méthodes de travail, encouragent la curiosité et redonnent confiance aux élèves. C’est un moment de transition douce entre l’école et la maison.</p>
+                        <p class="text-muted">Nos bénévoles transmettent des méthodes de travail, encouragent la curiosité et redonnent confiance aux élèves.</p>
                         <ul class="list-unstyled mt-3">
                             <li class="mb-2">📅 <strong>Quand ?</strong> Lundi, Mardi, Jeudi, Vendredi</li>
                             <li class="mb-2">🕒 <strong>Heure ?</strong> De 16h30 à 18h00</li>
@@ -156,21 +186,30 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                     <div class="card-header bg-primary text-white text-center"><h5 class="mb-0">📝 Inscrire mon enfant</h5></div>
                     <div class="card-body">
                         <?php if ($inscription_ok): ?><div class="alert alert-success">✅ Demande d'inscription envoyée !</div><?php endif; ?>
+                        
                         <form method="POST" action="#actions">
                             <input type="hidden" name="form_type" value="devoirs">
                             <div class="row">
                                 <div class="col-6 mb-3"><label>Nom de l'enfant</label><input type="text" name="nom" class="form-control" required></div>
                                 <div class="col-6 mb-3"><label>Prénom</label><input type="text" name="prenom" class="form-control" required></div>
                             </div>
-                            <div class="mb-3"><label>Classe</label><input type="text" name="classe" class="form-control" placeholder="Ex: CM1" required></div>
-                            <div class="mb-3"><label>Téléphone du parent</label><input type="tel" name="tel" class="form-control" required></div>
+                            
+                            <div class="mb-3">
+                                <label>Email du parent</label>
+                                <input type="email" name="email" class="form-control" placeholder="parent@email.com" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6 mb-3"><label>Classe</label><input type="text" name="classe" class="form-control" placeholder="Ex: CM1" required></div>
+                                <div class="col-6 mb-3"><label>Téléphone</label><input type="tel" name="tel" class="form-control" required></div>
+                            </div>
                             <button type="submit" class="btn btn-warning w-100 fw-bold">Valider l'inscription</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-
+        
         <div class="row align-items-center mt-5">
             <div class="col-lg-12 text-center mb-4"><h3 class="fw-bold text-success">🏘️ Vie de Quartier & Citoyenneté</h3></div>
             <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="100">
@@ -197,7 +236,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                 <div class="col-lg-6" data-aos="fade-right">
                     <h2 class="fw-bold mb-4">Rejoignez l'aventure !</h2>
                     <p class="lead">Devenir bénévole au sein de notre association, c'est choisir de consacrer un peu de son temps pour faire une grande différence dans la vie du quartier.</p>
-                    <p>Que vous soyez étudiant, actif ou retraité, votre expérience est une richesse. Nous ne recherchons pas des experts, mais des personnes motivées, prêtes à transmettre un savoir ou simplement offrir une oreille attentive.</p>
+                    <p>Que vous soyez étudiant, actif ou retraité, votre expérience est une richesse. Nous ne recherchons pas des experts, mais des personnes motivées.</p>
                     <h5 class="fw-bold mt-4 border-top pt-3">Nos besoins actuels :</h5>
                     <ul class="list-group list-group-flush bg-transparent">
                         <li class="list-group-item bg-transparent">📚 Aide aux devoirs</li>
@@ -205,16 +244,53 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                         <li class="list-group-item bg-transparent">🎪 Logistique événements</li>
                     </ul>
                 </div>
+                
                 <div class="col-lg-6" data-aos="zoom-in">
                     <div class="card shadow-lg border-0 rounded-4">
                         <div class="card-body p-5">
                             <h3 class="text-center mb-4 text-primary">Je me lance !</h3>
-                            <?php if ($benevole_ok): ?><div class="alert alert-success">👏 Merci ! On vous recontacte vite.</div><?php endif; ?>
-                            <form method="POST" action="#benevolat">
+                            
+                            <?php if ($benevole_ok): ?>
+                                <div class="alert alert-success">👏 Candidature envoyée !</div>
+                            <?php endif; ?>
+                            <?php if (!empty($error_msg)): ?>
+                                <div class="alert alert-danger">⚠️ <?= $error_msg ?></div>
+                            <?php endif; ?>
+
+                            <form method="POST" action="#benevolat" enctype="multipart/form-data">
                                 <input type="hidden" name="form_type" value="benevolat">
-                                <div class="mb-3"><label>Nom & Prénom</label><input type="text" name="nom" class="form-control" required></div>
-                                <div class="mb-3"><label>Mes disponibilités</label><input type="text" name="dispo" class="form-control" placeholder="Ex: Mercredi après-midi" required></div>
-                                <div class="mb-3"><label>Ce que j'aime faire</label><textarea name="skills" class="form-control" rows="3" placeholder="J'aime cuisiner, aider en maths..."></textarea></div>
+                                
+                                <div class="mb-3">
+                                    <label>Nom & Prénom</label>
+                                    <input type="text" name="nom" class="form-control" required>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label>Email</label>
+                                        <input type="email" name="email" class="form-control" required>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label>Téléphone</label>
+                                        <input type="tel" name="tel" class="form-control" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label>Votre CV (PDF, Word - Max 5 Mo)</label>
+                                    <input type="file" name="cv" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label>Mes disponibilités</label>
+                                    <input type="text" name="dispo" class="form-control" placeholder="Ex: Mercredi après-midi" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label>Ce que j'aime faire</label>
+                                    <textarea name="skills" class="form-control" rows="3" placeholder="J'aime cuisiner, aider en maths..."></textarea>
+                                </div>
+                                
                                 <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">Envoyer ma candidature</button>
                             </form>
                         </div>
