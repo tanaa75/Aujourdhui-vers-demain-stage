@@ -1,6 +1,8 @@
 # Plateforme Web - Association "Aujourd'hui vers Demain"
 
-Ce dépôt contient le code source de la solution web développée pour l'association **Aujourd'hui vers Demain** (Noisy-le-Sec). Ce projet a été réalisé dans le cadre du BTS SIO, répondant à un besoin de digitalisation des processus de l'association (gestion des bénévoles, communication événementielle et aide aux devoirs).
+> **Projet réalisé dans le cadre d'un stage en développement web.**
+
+Ce dépôt regroupe l'intégralité du travail technique effectué pour la digitalisation de l'association **Aujourd'hui vers Demain** (Noisy-le-Sec). Notre mission a consisté à concevoir, développer et déployer une solution complète incluant un **site web dynamique** et une **base de données relationnelle**.
 
 ![Aperçu de l'application](image_71fdc5.jpg)
 
@@ -10,46 +12,56 @@ Ce dépôt contient le code source de la solution web développée pour l'associ
 
 ---
 
+## 🎯 Objectifs du Stage
+
+Durant ce projet, nous avons géré l'ensemble du cycle de développement :
+1.  **Conception BDD :** Modélisation et création de la base de données (Tables, Relations, Contraintes).
+2.  **Développement Full-Stack :** Création de l'interface utilisateur (Front) et de la logique serveur (Back).
+3.  **Administration :** Gestion des données via PhpMyAdmin et création d'un Back-Office sécurisé pour l'association.
+
+---
+
 ## 🛠️ Stack Technique
 
-Le projet repose sur une architecture web standardisée, sans dépendance lourde, garantissant maintenabilité et performance.
-
-* **Back-End :** PHP 8 (Natif)
-* **Base de Données :** MySQL / MariaDB
+* **Langage Back-End :** PHP 8 (Natif)
+* **Base de Données :** MySQL (Gestion via SQL & PhpMyAdmin)
 * **Front-End :** HTML5, CSS3, Bootstrap 5.3
-* **Scripting Client :** JavaScript (ES6+)
-* **Bibliothèques :** AOS (Animate On Scroll) pour les interactions UI.
+* **Scripting :** JavaScript (ES6+)
+* **Outils :** Visual Studio Code, Laragon/WAMP, Git.
 
 ---
 
-## 💻 Fonctionnalités Implémentées
+## 💻 Fonctionnalités Développées
 
-### 1. Interface Publique (Front-Office)
-L'interface a été conçue sous forme de **One Page** pour optimiser le parcours utilisateur.
-* **UX/UI Design :** Navigation fluide (Smooth Scroll), Design Responsive (Mobile First).
-* **Accessibilité :** Module de **Thème Sombre/Clair (Dark Mode)** avec persistance des préférences (LocalStorage).
-* **Modules Interactifs :**
-    * Moteur de recherche d'événements (Requêtes SQL préparées `LIKE`).
-    * Formulaires dynamiques (Candidature Bénévolat & Inscription Aide aux Devoirs).
-    * Intégration API Google Maps (iFrame).
+### 1. Gestion de la Base de Données & Back-Office
+Nous avons développé une interface d'administration sécurisée permettant à l'association de gérer ses données en toute autonomie :
+* **Authentification sécurisée** (Hachage `password_hash`).
+* **CRUD complet** sur les événements (Ajout, Modification, Suppression avec upload d'images).
+* **Centralisation des messages** : Stockage en base de données des formulaires de contact et d'inscriptions.
 
-### 2. Interface d'Administration (Back-Office)
-Espace sécurisé dédié à la gestion de contenu (CMS sur-mesure).
-* **Authentification :** Sécurisation des accès via hachage de mots de passe (`password_hash` / `password_verify`).
-* **Gestion des Événements (CRUD) :**
-    * Création, Lecture, Mise à jour, Suppression.
-    * Gestion de l'upload d'images serveur.
-* **Centralisation des Messages :** Réception et tri des soumissions de formulaires (Contact, Bénévolat, Inscriptions) en base de données.
-* **Sécurité du Compte :** Module de réinitialisation de mot de passe administrateur.
+### 2. Site Web Public (Front-Office)
+Une interface moderne "One Page" pour les visiteurs :
+* **UX/UI :** Design responsive, Mode Sombre/Clair, Animations (AOS).
+* **Interactions avec la BDD :** Moteur de recherche d'événements, formulaires d'inscription (Aide aux devoirs & Bénévolat).
+* **Services Tiers :** Intégration Google Maps.
 
 ---
 
-## ⚙️ Guide d'Installation (Déploiement Local)
+## ⚙️ Installation du Projet
 
-Pour déployer le projet sur un environnement de développement (Laragon, XAMPP, WAMP) :
+1.  **Cloner le dépôt** :
+    ```bash
+    git clone [https://github.com/tanaa75/Aujourdhui-vers-demain-stage.git](https://github.com/tanaa75/Aujourdhui-vers-demain-stage.git)
+    ```
+2.  **Base de Données** :
+    * Importer le script SQL fourni dans votre SGBD (ex: PhpMyAdmin).
+    * Nom de la base : `asso_db`.
+3.  **Configuration** :
+    * Vérifier les identifiants BDD dans le fichier `db.php`.
+4.  **Accès Admin** :
+    * URL : `/login.php`
+    * Login défaut : `admin` / `admin123`
 
-### 1. Configuration des fichiers
-Cloner le dépôt dans le répertoire public du serveur web.
+---
 
-```bash
-git clone [https://github.com/tanaa75/Aujourdhui-vers-demain-stage.git](https://github.com/tanaa75/Aujourdhui-vers-demain-stage.git)
+© 2026 - CA TANAVONG & BEDJOU AYOUB.
