@@ -1,14 +1,23 @@
 <?php
+session_start();
 require_once 'db.php';
 $msg_envoye = false;
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Vérification : Membre OU Admin connecté ?
+$est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
+
+// TRAITEMENT (Seulement si connecté)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $est_connecte) {
     if (!empty($_POST['nom']) && !empty($_POST['email']) && !empty($_POST['message'])) {
         $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
         $stmt->execute([$_POST['nom'], $_POST['email'], $_POST['message']]);
         $msg_envoye = true;
     }
 }
+
+// Pré-remplissage
+$nom_user = isset($_SESSION['membre_nom']) ? $_SESSION['membre_nom'] : "";
+$email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 ?>
 
 <!DOCTYPE html>
@@ -34,29 +43,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-lg-6">
                 <div class="card shadow border-0 h-100">
                     <div class="card-body p-4 p-md-5">
-                        <h4 class="mb-4">💌 Envoyez-nous un message</h4>
                         
-                        <?php if ($msg_envoye): ?>
-                            <div class="alert alert-success text-center animate__animated animate__fadeIn">
-                                ✅ Message envoyé ! On vous répond très vite.
+                        <?php if ($est_connecte): ?>
+
+                            <h4 class="mb-4">💌 Envoyez-nous un message</h4>
+                            
+                            <?php if ($msg_envoye): ?>
+                                <div class="alert alert-success text-center animate__animated animate__fadeIn">
+                                    ✅ Message envoyé ! On vous répond très vite.
+                                </div>
+                            <?php endif; ?>
+
+                            <form method="POST">
+                                <div class="form-floating mb-3">
+                                    <input type="text" name="nom" class="form-control" id="floatingNom" required placeholder="Nom" value="<?= htmlspecialchars($nom_user) ?>">
+                                    <label for="floatingNom">Votre Nom</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input type="email" name="email" class="form-control" id="floatingEmail" required placeholder="Email" value="<?= htmlspecialchars($email_user) ?>">
+                                    <label for="floatingEmail">Votre Email</label>
+                                </div>
+                                <div class="form-floating mb-4">
+                                    <textarea name="message" class="form-control" id="floatingMsg" style="height: 150px" required placeholder="Message"></textarea>
+                                    <label for="floatingMsg">Votre Message</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">🚀 Envoyer le message</button>
+                            </form>
+
+                        <?php else: ?>
+                            <div class="text-center py-5">
+                                <div class="mb-3" style="font-size: 4rem;">🔒</div>
+                                <h4 class="fw-bold">Espace réservé aux membres</h4>
+                                <p class="text-muted mb-4">Vous devez avoir un compte pour nous envoyer un message.</p>
+                                <div class="d-grid gap-2 col-8 mx-auto">
+                                    <a href="connexion.php" class="btn btn-primary rounded-pill fw-bold">Me connecter</a>
+                                    <a href="inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
+                                </div>
                             </div>
                         <?php endif; ?>
 
-                        <form method="POST">
-                            <div class="form-floating mb-3">
-                                <input type="text" name="nom" class="form-control" id="floatingNom" required placeholder="Nom">
-                                <label for="floatingNom">Votre Nom</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="email" name="email" class="form-control" id="floatingEmail" required placeholder="Email">
-                                <label for="floatingEmail">Votre Email</label>
-                            </div>
-                            <div class="form-floating mb-4">
-                                <textarea name="message" class="form-control" id="floatingMsg" style="height: 150px" required placeholder="Message"></textarea>
-                                <label for="floatingMsg">Votre Message</label>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">🚀 Envoyer le message</button>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -74,11 +99,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <div class="card shadow border-0 flex-grow-1 map-container">
                         <iframe 
-                            src="https://maps.google.com/maps?q=116+rue+de+l'Avenir+Noisy-le-Sec&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                            src="https://maps.google.com/maps?q=116+rue+de+l'Avenir+93130+Noisy-le-Sec&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                             frameborder="0" 
                             scrolling="no" 
                             marginheight="0" 
-                            marginwidth="0">
+                            marginwidth="0"
+                            allowfullscreen>
                         </iframe>
                     </div>
                 </div>
@@ -87,7 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <?php include 'footer.php'; ?>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script_theme.js"></script>
 </body>
