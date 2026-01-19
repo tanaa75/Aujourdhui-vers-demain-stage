@@ -55,29 +55,266 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <style>body { transition: background-color 0.5s; }</style>
+    <style>
+        body { transition: background-color 0.5s; }
+        
+        /* SECTION BÉNÉVOLAT */
+        .need-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        
+        .need-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .need-card .rounded-circle {
+            transition: transform 0.3s ease;
+        }
+        
+        .need-card:hover .rounded-circle {
+            transform: rotate(360deg) scale(1.1);
+        }
+        
+        .volunteer-form-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .volunteer-form-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .volunteer-form-card .card-header {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .volunteer-form-card .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-30%, -30%) rotate(180deg); }
+        }
+        
+        /* ADAPTATION MODE SOMBRE POUR SECTION BÉNÉVOLAT */
+        .benevolat-section {
+            background: var(--bs-body-bg);
+        }
+        
+        .benevolat-bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.4;
+            background-image: radial-gradient(circle at 20% 50%, rgba(13, 110, 253, 0.15) 0%, transparent 50%), 
+                              radial-gradient(circle at 80% 80%, rgba(255, 193, 7, 0.15) 0%, transparent 50%);
+        }
+        
+        /* Mode clair */
+        [data-bs-theme="light"] .benevolat-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        [data-bs-theme="light"] .benevolat-text {
+            color: #6c757d !important;
+        }
+        
+        [data-bs-theme="light"] .benevolat-alert {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+        
+        [data-bs-theme="light"] .benevolat-alert-text {
+            color: #6c757d !important;
+        }
+        
+        [data-bs-theme="light"] .need-card {
+            background-color: #ffffff !important;
+            color: #212529;
+        }
+        
+        [data-bs-theme="light"] .need-card-text {
+            color: #6c757d !important;
+        }
+        
+        [data-bs-theme="light"] .benevolat-footer-text {
+            color: #6c757d !important;
+        }
+        
+        /* Mode sombre */
+        [data-bs-theme="dark"] .benevolat-section {
+            background: linear-gradient(135deg, #1a1d20 0%, #2d3238 100%);
+        }
+        
+        [data-bs-theme="dark"] .benevolat-text {
+            color: #adb5bd !important;
+        }
+        
+        [data-bs-theme="dark"] .benevolat-alert {
+            background-color: rgba(13, 110, 253, 0.15);
+            color: #f8f9fa;
+            border-color: #0d6efd !important;
+        }
+        
+        [data-bs-theme="dark"] .benevolat-alert-text {
+            color: #adb5bd !important;
+        }
+        
+        [data-bs-theme="dark"] .need-card {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: #f8f9fa;
+            backdrop-filter: blur(10px);
+        }
+        
+        [data-bs-theme="dark"] .need-card:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        [data-bs-theme="dark"] .need-card-text {
+            color: #adb5bd !important;
+        }
+        
+        [data-bs-theme="dark"] .benevolat-footer-text {
+            color: #adb5bd !important;
+        }
+        
+        /* HEADER FORMULAIRE - ADAPTATION THÈME */
+        [data-bs-theme="light"] .form-header-title,
+        [data-bs-theme="light"] .form-header-subtitle {
+            color: #212529 !important;
+        }
+        
+        [data-bs-theme="dark"] .form-header-title,
+        [data-bs-theme="dark"] .form-header-subtitle {
+            color: #ffffff !important;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php include 'navbar.php'; ?>
 
-    <div class="container py-5">
-        <div class="row align-items-center">
-            
-            <div class="col-lg-6" data-aos="fade-right">
-                <h1 class="fw-bold mb-4">Rejoignez l'aventure !</h1>
-                <p class="lead">Devenir bénévole, c'est choisir de consacrer un peu de son temps pour faire une grande différence dans la vie du quartier.</p>
-                <h5 class="fw-bold mt-4 border-top pt-3">Nos besoins actuels :</h5>
-                <ul class="list-group list-group-flush bg-transparent">
-                    <li class="list-group-item bg-transparent">📚 Aide aux devoirs</li>
-                    <li class="list-group-item bg-transparent">💻 Atelier Informatique</li>
-                    <li class="list-group-item bg-transparent">🎪 Logistique événements</li>
-                </ul>
-            </div>
-
-            <div class="col-lg-6" data-aos="zoom-in">
-                <div class="card shadow-lg border-0 rounded-4">
-                    <div class="card-body p-5">
-                        <h3 class="text-center mb-4 text-primary">Je me lance !</h3>
+    <div class="position-relative py-5 overflow-hidden benevolat-section">
+        <div class="benevolat-bg-overlay"></div>
+        
+        <div class="container position-relative" style="z-index: 2;">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="mb-4">
+                        <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3 shadow-sm">
+                            <i class="bi bi-heart-fill"></i> Rejoignez-nous
+                        </span>
+                        <h2 class="display-5 fw-bold mb-3">Rejoignez l'aventure !</h2>
+                        <p class="lead benevolat-text mb-4">
+                            Devenir bénévole, c'est choisir de consacrer un peu de son temps pour faire une grande différence dans la vie du quartier.
+                        </p>
+                    </div>
+                    
+                    <div class="alert benevolat-alert border-start border-primary border-4 shadow-sm mb-4" role="alert">
+                        <p class="mb-2 fw-semibold">💡 Aucune expertise requise !</p>
+                        <p class="small benevolat-alert-text mb-0">Ce qui compte, c'est votre envie d'être utile et de partager un moment avec la communauté.</p>
+                    </div>
+                    
+                    <h5 class="fw-bold mb-3">
+                        <span class="border-bottom border-warning border-3 pb-1">Nos besoins actuels</span>
+                    </h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+                            <div class="need-card p-3 rounded-3 border border-2 border-primary h-100 shadow-sm">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <span class="fs-4">📚</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-1">Aide aux devoirs</h6>
+                                        <p class="small need-card-text mb-0">Accompagnement scolaire</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+                            <div class="need-card p-3 rounded-3 border border-2 border-info h-100 shadow-sm">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <span class="fs-4">💻</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-1">Atelier informatique</h6>
+                                        <p class="small need-card-text mb-0">Initiation numérique</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+                            <div class="need-card p-3 rounded-3 border border-2 border-warning h-100 shadow-sm">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="bg-warning bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <span class="fs-4">🎪</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-1">Organisation fêtes</h6>
+                                        <p class="small need-card-text mb-0">Événements quartier</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6" data-aos="fade-up" data-aos-delay="400">
+                            <div class="need-card p-3 rounded-3 border border-2 border-success h-100 shadow-sm">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-3">
+                                        <div class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                            <span class="fs-4">🎨</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-1">Ateliers créatifs</h6>
+                                        <p class="small need-card-text mb-0">Art & bricolage</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-2 benevolat-footer-text">
+                        <svg width="20" height="20" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                        </svg>
+                        <small class="fw-semibold">Flexible : 1h/semaine ou plus selon vos disponibilités</small>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="200">
+                    <div class="card shadow-lg border-0 rounded-4 overflow-hidden volunteer-form-card">
+                        <div class="card-header bg-gradient text-white text-center py-4 border-0" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                            <div class="mb-2">
+                                <span class="fs-1">🚀</span>
+                            </div>
+                            <h3 class="mb-1 fw-bold form-header-title">Je me lance !</h3>
+                            <p class="small mb-0 fw-semibold form-header-subtitle">Remplissez le formulaire ci-dessous</p>
+                        </div>
+                        <div class="card-body p-4">
                         
                         <?php if ($est_connecte): ?>
                             
@@ -137,6 +374,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                             </div>
                         <?php endif; ?>
 
+                        </div>
                     </div>
                 </div>
             </div>

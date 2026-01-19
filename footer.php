@@ -54,8 +54,8 @@
             </div>
             <div class="col-md-5 col-lg-4">
                 <div class="text-center text-md-end">
-                    <a href="#" class="text-white text-decoration-none me-3 small opacity-75 footer-link">Mentions Légales</a>
-                    <a href="#" class="text-white text-decoration-none small opacity-75 footer-link">Confidentialité</a>
+                <a href="mentions_legales.php" class="text-white text-decoration-none me-3 small opacity-75 footer-link">Mentions Légales</a>
+<a href="confidentialite.php" class="text-white text-decoration-none small opacity-75 footer-link">Politique de Confidentialité</a>
                 </div>
             </div>
         </div>

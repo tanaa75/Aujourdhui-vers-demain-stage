@@ -43,43 +43,205 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
             cursor: pointer;
         }
         .hover-card:hover {
-            transform: translateY(-15px); /* Monte vers le haut */
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important; /* Ombre plus forte */
+            transform: translateY(-15px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
         }
         .hover-card .emoji-icon {
             display: inline-block;
             transition: transform 0.3s;
         }
         .hover-card:hover .emoji-icon {
-            transform: scale(1.3) rotate(10deg); /* L'emoji grossit et tourne */
+            transform: scale(1.3) rotate(10deg);
+        }
+        
+        /* SECTION ACTIONS - ADAPTATION THÈME */
+        .actions-section {
+            background: var(--bs-body-bg);
+        }
+        
+        .actions-icon-wrapper {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+        
+        .actions-info-card:hover .actions-icon-wrapper {
+            transform: rotate(10deg) scale(1.1);
+        }
+        
+        .info-badge {
+            transition: all 0.3s ease;
+        }
+        
+        .info-badge:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* Mode clair */
+        [data-bs-theme="light"] .actions-subtitle {
+            color: #6c757d;
+        }
+        
+        [data-bs-theme="light"] .actions-info-card {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+        }
+        
+        [data-bs-theme="light"] .actions-icon-wrapper {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+        
+        [data-bs-theme="light"] .actions-title {
+            color: #212529;
+        }
+        
+        [data-bs-theme="light"] .actions-text {
+            color: #6c757d;
+        }
+        
+        [data-bs-theme="light"] .actions-border {
+            border-color: #e9ecef !important;
+        }
+        
+        [data-bs-theme="light"] .actions-subtitle-small {
+            color: #495057;
+        }
+        
+        [data-bs-theme="light"] .info-badge {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+        
+        [data-bs-theme="light"] .actions-label {
+            color: #6c757d;
+        }
+        
+        [data-bs-theme="light"] .actions-value {
+            color: #212529;
+        }
+        
+        /* Mode sombre */
+        [data-bs-theme="dark"] .actions-subtitle {
+            color: #adb5bd;
+        }
+        
+        [data-bs-theme="dark"] .actions-info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        [data-bs-theme="dark"] .actions-icon-wrapper {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        }
+        
+        [data-bs-theme="dark"] .actions-title {
+            color: #f8f9fa;
+        }
+        
+        [data-bs-theme="dark"] .actions-text {
+            color: #adb5bd;
+        }
+        
+        [data-bs-theme="dark"] .actions-border {
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+        
+        [data-bs-theme="dark"] .actions-subtitle-small {
+            color: #dee2e6;
+        }
+        
+        [data-bs-theme="dark"] .info-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        [data-bs-theme="dark"] .actions-label {
+            color: #868e96;
+        }
+        
+        [data-bs-theme="dark"] .actions-value {
+            color: #f8f9fa;
         }
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php include 'navbar.php'; ?>
 
-    <div class="container py-5">
-        <h1 class="text-center mb-5 fw-bold text-primary" data-aos="fade-down">Nos Champs d'Action</h1>
-
-        <div class="row mb-5 align-items-center" id="devoirs">
-            <div class="col-lg-6" data-aos="fade-right">
-                <div class="card shadow border-0 h-100 bg-body-tertiary">
-                    <div class="card-body p-4">
-                        <h3 class="fw-bold text-warning mb-3">✏️ L’Aide aux Devoirs</h3>
-                        <p class="text-muted">
-                            L'aide aux devoirs chez <strong>Aujourd'hui vers Demain</strong>, c'est un espace bienveillant où chaque enfant bénéficie d'une attention particulière.
-                        </p>
-                        <p class="text-muted">
-                            Nos bénévoles ne se contentent pas de vérifier que les exercices sont faits ; ils transmettent des méthodes de travail et redonnent confiance.
-                        </p>
-                        <ul class="list-unstyled mt-3">
-                            <li class="mb-2">📅 <strong>Quand ?</strong> Lundi, Mardi, Jeudi, Vendredi</li>
-                            <li class="mb-2">🕒 <strong>Heure ?</strong> De 16h30 à 18h00</li>
-                            <li class="mb-2">👩‍🏫 <strong>Pour qui ?</strong> Enfants du CP au CM2</li>
-                        </ul>
+    <div class="actions-section py-5">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-down">
+                <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3 shadow-sm">
+                    📚 Nos Actions
+                </span>
+                <h2 class="display-5 fw-bold mb-3">L'Aide aux Devoirs</h2>
+                <p class="lead actions-subtitle">Accompagner chaque enfant vers la réussite</p>
+            </div>
+            
+            <div class="row align-items-center g-5" id="devoirs">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <div class="actions-info-card p-4 rounded-4 shadow-lg h-100">
+                        <div class="d-flex align-items-start mb-4">
+                            <div class="flex-shrink-0 me-3">
+                                <div class="actions-icon-wrapper">
+                                    <span class="fs-1">✏️</span>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="fw-bold mb-3 actions-title">Notre Mission</h3>
+                                <p class="actions-text mb-3">
+                                    L'aide aux devoirs chez <strong>Aujourd'hui vers Demain</strong>, c'est un espace bienveillant où chaque enfant bénéficie d'une attention particulière.
+                                </p>
+                                <p class="actions-text">
+                                    Nos bénévoles ne se contentent pas de vérifier que les exercices sont faits ; ils transmettent des méthodes de travail et redonnent confiance.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="border-top actions-border pt-4">
+                            <h5 class="fw-bold mb-3 actions-subtitle-small">📋 Informations pratiques</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="info-badge p-3 rounded-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2 fs-5">📅</span>
+                                            <div>
+                                                <small class="d-block text-uppercase fw-semibold actions-label">Jours</small>
+                                                <span class="fw-bold actions-value">Lun, Mar, Jeu, Ven</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="info-badge p-3 rounded-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2 fs-5">🕒</span>
+                                            <div>
+                                                <small class="d-block text-uppercase fw-semibold actions-label">Horaires</small>
+                                                <span class="fw-bold actions-value">16h30 - 18h00</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="info-badge p-3 rounded-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2 fs-5">👩‍🏫</span>
+                                            <div>
+                                                <small class="d-block text-uppercase fw-semibold actions-label">Niveaux</small>
+                                                <span class="fw-bold actions-value">Du CP au CM2</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
             
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="card border-primary shadow">

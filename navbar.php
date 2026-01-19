@@ -15,11 +15,8 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-center">
         <li class="nav-item"><a class="nav-link" href="index.php">🏠 Accueil</a></li>
-        
         <li class="nav-item"><a class="nav-link" href="actions.php">📚 Nos Actions</a></li>
-        
         <li class="nav-item"><a class="nav-link" href="benevolat.php">🤝 Bénévolat</a></li>
-
         <li class="nav-item"><a class="nav-link" href="contact.php">✉️ Contact</a></li>
         
         <?php if (isset($_SESSION['user_id'])): ?>
@@ -38,7 +35,7 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
         <?php elseif (isset($_SESSION['membre_id'])): ?>
             <li class="nav-item dropdown ms-2">
-                <a class="nav-link dropdown-toggle btn bg-white text-dark px-3 rounded-pill fw-bold shadow-sm border-0" href="#" role="button" data-bs-toggle="dropdown" style="transition: transform 0.2s;">
+                <a class="nav-link dropdown-toggle btn bg-white text-dark px-3 rounded-pill fw-bold shadow-sm border-0" href="#" role="button" data-bs-toggle="dropdown">
                     👤 <?= htmlspecialchars($_SESSION['membre_nom']) ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
