@@ -540,9 +540,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
     <div class="actions-section py-5" id="actions">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-down">
-                <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3 shadow-sm">
-                    📚 Nos Actions
-                </span>
+                
                 <h2 class="display-5 fw-bold mb-3">L'Aide aux Devoirs</h2>
                 <p class="lead actions-subtitle">Accompagner chaque enfant vers la réussite</p>
             </div>
@@ -687,9 +685,6 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             <div class="row align-items-center g-5">
                 <div class="col-lg-6" data-aos="fade-right">
                     <div class="mb-4">
-                        <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3 shadow-sm">
-                            <i class="bi bi-heart-fill"></i> Rejoignez-nous
-                        </span>
                         <h2 class="display-5 fw-bold mb-3">Rejoignez l'aventure !</h2>
                         <p class="lead benevolat-text mb-4">
                             Devenir bénévole, c'est choisir de consacrer un peu de son temps pour faire une grande différence dans la vie du quartier.
