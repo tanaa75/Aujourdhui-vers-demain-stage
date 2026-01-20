@@ -45,6 +45,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <li class="nav-item"><a class="nav-link" href="index.php">🏠 Accueil</a></li>
         <li class="nav-item"><a class="nav-link" href="actions.php">📚 Nos Actions</a></li>
         <li class="nav-item"><a class="nav-link" href="benevolat.php">🤝 Bénévolat</a></li>
+        <li class="nav-item"><a class="nav-link" href="galerie.php">📷 Galerie</a></li>
         <li class="nav-item"><a class="nav-link" href="contact.php">✉️ Contact</a></li>
         
         <?php if (isset($_SESSION['user_id'])): ?>
