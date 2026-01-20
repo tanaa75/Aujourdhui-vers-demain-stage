@@ -1,25 +1,55 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+/**
+ * ===========================================
+ * BARRE DE NAVIGATION (NAVBAR)
+ * ===========================================
+ * 
+ * Ce fichier contient le menu de navigation du site.
+ * Il est inclus dans toutes les pages via include 'navbar.php'.
+ * 
+ * Fonctionnalités :
+ * - Logo et nom de l'association
+ * - Liens vers les pages principales
+ * - Menu admin (si administrateur connecté)
+ * - Menu membre (si membre connecté)
+ * - Bouton de connexion (si non connecté)
+ * - Toggle mode jour/nuit
+ */
+
+// On démarre la session seulement si elle n'est pas déjà active
+if (session_status() === PHP_SESSION_NONE) { 
+    session_start(); 
+}
 ?>
+
+<!-- Navigation principale - sticky-top = reste en haut lors du scroll -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4 sticky-top shadow">
   <div class="container">
+    
+    <!-- Logo et nom de l'association -->
     <a class="navbar-brand d-flex align-items-center fw-bold" href="index.php">
         <img src="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" alt="Logo" width="35" height="35" class="d-inline-block align-text-top me-2 animate-logo">
         Aujourd'hui vers Demain
     </a>
     
+    <!-- Bouton hamburger pour mobile -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
     
+    <!-- Menu de navigation -->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-center">
+        
+        <!-- Liens principaux -->
         <li class="nav-item"><a class="nav-link" href="index.php">🏠 Accueil</a></li>
         <li class="nav-item"><a class="nav-link" href="actions.php">📚 Nos Actions</a></li>
         <li class="nav-item"><a class="nav-link" href="benevolat.php">🤝 Bénévolat</a></li>
         <li class="nav-item"><a class="nav-link" href="contact.php">✉️ Contact</a></li>
         
         <?php if (isset($_SESSION['user_id'])): ?>
+            <!-- ========== MENU ADMINISTRATEUR ========== -->
+            <!-- Affiché seulement si un admin est connecté -->
             <li class="nav-item dropdown ms-2">
                 <a class="nav-link dropdown-toggle btn btn-warning text-dark px-3 rounded-pill fw-bold shadow-sm" href="#" role="button" data-bs-toggle="dropdown">
                     ⚙️ ADMIN
@@ -34,11 +64,14 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             </li>
 
         <?php elseif (isset($_SESSION['membre_id'])): ?>
+            <!-- ========== MENU MEMBRE ========== -->
+            <!-- Affiché seulement si un membre est connecté -->
             <li class="nav-item dropdown ms-2">
                 <a class="nav-link dropdown-toggle btn bg-white text-dark px-3 rounded-pill fw-bold shadow-sm border-0" href="#" role="button" data-bs-toggle="dropdown">
                     👤 <?= htmlspecialchars($_SESSION['membre_nom']) ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                    <!-- Affiche l'email du membre -->
                     <li><span class="dropdown-item-text text-muted small"><i class="bi bi-envelope"></i> <?= htmlspecialchars($_SESSION['membre_email']) ?></span></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger fw-bold" href="logout_membre.php"><i class="bi bi-box-arrow-right"></i> Se déconnecter</a></li>
@@ -46,16 +79,20 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             </li>
 
         <?php else: ?>
+            <!-- ========== BOUTON CONNEXION ========== -->
+            <!-- Affiché si personne n'est connecté -->
             <li class="nav-item ms-2">
                 <a class="btn btn-outline-light rounded-pill px-4 fw-bold" href="connexion.php">Se connecter</a>
             </li>
         <?php endif; ?>
 
+        <!-- Bouton toggle mode jour/nuit -->
         <li class="nav-item ms-2">
             <button class="btn btn-outline-light rounded-circle" onclick="toggleTheme()" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
                 <span id="theme-icon">🌙</span>
             </button>
         </li>
+        
       </ul>
     </div>
   </div>

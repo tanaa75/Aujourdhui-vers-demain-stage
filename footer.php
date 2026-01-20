@@ -12,10 +12,7 @@
             <div class="col-lg-4 col-md-6">
                 <div class="footer-section">
                     <div class="d-flex align-items-center mb-4">
-                        <div class="footer-logo-icon me-3">
-                            <i class="bi bi-heart-fill"></i>
-                        </div>
-                        <h4 class="footer-brand mb-0">Aujourd'hui vers Demain</h4>
+                         <h4 class="footer-brand mb-0">Aujourd'hui vers Demain</h4>
                     </div>
                     <p class="footer-description mb-4">
                         Notre mission est de renforcer les liens sociaux et d'apporter une aide concrète aux habitants de Noisy-le-Sec pour un avenir solidaire.
@@ -66,7 +63,7 @@
                         <li class="mb-3">
                             <div class="d-flex align-items-start">
                                 <div class="footer-contact-icon me-3">
-                                    <i class="bi bi-geo-alt-fill"></i>
+                                    📍
                                 </div>
                                 <div>
                                     <div class="footer-contact-text">116 rue de l'Avenir</div>
@@ -77,7 +74,7 @@
                         <li class="mb-3">
                             <div class="d-flex align-items-center">
                                 <div class="footer-contact-icon me-3">
-                                    <i class="bi bi-envelope-fill"></i>
+                                    ✉️
                                 </div>
                                 <a href="mailto:contact@asso.fr" class="footer-contact-link">contact@asso.fr</a>
                             </div>
@@ -85,7 +82,7 @@
                         <li class="mb-3">
                             <div class="d-flex align-items-center">
                                 <div class="footer-contact-icon me-3">
-                                    <i class="bi bi-telephone-fill"></i>
+                                    📞
                                 </div>
                                 <a href="tel:0123456789" class="footer-contact-link">01 23 45 67 89</a>
                             </div>
@@ -158,7 +155,7 @@
         .footer-logo-icon {
             width: 50px;
             height: 50px;
-            border-radius: 12px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -177,7 +174,7 @@
         .footer-social-btn {
             width: 45px;
             height: 45px;
-            border-radius: 12px;
+            border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -231,11 +228,11 @@
         .footer-contact-icon {
             width: 35px;
             height: 35px;
-            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            font-size: 1.3rem;
         }
         
         .footer-contact-link {
@@ -355,10 +352,7 @@
             color: #0d6efd;
         }
         
-        [data-bs-theme="light"] .footer-contact-icon {
-            background: linear-gradient(135deg, #ffc107, #ff9800);
-            color: #ffffff;
-        }
+
         
         [data-bs-theme="light"] .footer-contact-text {
             color: #6c757d;
@@ -447,8 +441,9 @@
         }
         
         [data-bs-theme="dark"] .footer-contact-icon {
-            background: linear-gradient(135deg, #ffc107, #ff9800);
-            color: #212529;
+            background: rgba(77, 171, 247, 0.15);
+            color: #4dabf7;
+            border: 2px solid rgba(77, 171, 247, 0.3);
         }
         
         [data-bs-theme="dark"] .footer-contact-text {

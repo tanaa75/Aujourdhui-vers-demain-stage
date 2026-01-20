@@ -191,9 +191,6 @@
     <div class="legal-header">
         <div class="container">
             <div class="text-center legal-title">
-                <div class="legal-icon">
-                    <i class="bi bi-shield-check"></i>
-                </div>
                 <h1 class="display-4 fw-bold mb-3">Mentions Légales</h1>
                 <p class="lead legal-subtitle">Informations légales et réglementaires</p>
             </div>

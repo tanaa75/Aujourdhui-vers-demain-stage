@@ -29,7 +29,7 @@ $messages = $query->fetchAll();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        body { background-color: #f8f9fa; }
+        body { transition: background-color 0.5s; }
         .card-message { transition: transform 0.2s; border: none; border-left: 5px solid #0d6efd; }
         .card-message:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .type-benevole { border-left-color: #dc3545; }
@@ -41,6 +41,24 @@ $messages = $query->fetchAll();
         #copyToast.show { visibility: visible; -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        
+        /* Mode clair */
+        [data-bs-theme="light"] .message-bg {
+            background: #f8f9fa;
+        }
+        [data-bs-theme="light"] .message-content {
+            background: #f1f3f5;
+            color: #555;
+        }
+        
+        /* Mode sombre */
+        [data-bs-theme="dark"] .message-bg {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        [data-bs-theme="dark"] .message-content {
+            background: rgba(255, 255, 255, 0.08);
+            color: #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -118,8 +136,8 @@ $messages = $query->fetchAll();
                                 </div>
 
                                 <hr class="my-3 opacity-10">
-                                <div class="bg-light p-3 rounded-3 mb-3">
-                                    <pre class="mb-0" style="font-family: inherit; white-space: pre-wrap; color: #555;"><?= htmlspecialchars(trim($msg_display)) ?></pre>
+                                <div class="message-content p-3 rounded-3 mb-3">
+                                    <pre class="mb-0" style="font-family: inherit; white-space: pre-wrap;"><?= htmlspecialchars(trim($msg_display)) ?></pre>
                                 </div>
 
                                 <div class="d-flex flex-wrap gap-2">
@@ -154,7 +172,10 @@ $messages = $query->fetchAll();
 
     <div id="copyToast">✅ Adresse email copiée !</div>
 
+    <?php include 'footer.php'; ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script_theme.js"></script>
     <script>
         // Fonction JavaScript pour copier le texte
         function copyToClipboard(text) {

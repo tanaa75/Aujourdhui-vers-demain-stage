@@ -206,9 +206,6 @@
     <div class="privacy-header">
         <div class="container">
             <div class="text-center privacy-title">
-                <div class="privacy-icon">
-                    <i class="bi bi-lock-fill"></i>
-                </div>
                 <h1 class="display-4 fw-bold mb-3">Politique de Confidentialité</h1>
                 <p class="lead privacy-subtitle">Protection de vos données personnelles</p>
             </div>

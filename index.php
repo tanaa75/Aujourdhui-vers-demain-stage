@@ -827,10 +827,10 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
         
         <div class="row justify-content-center mb-5">
             <div class="col-md-6">
-                <form method="GET" action="#events" class="d-flex gap-2 p-2 bg-body-tertiary rounded-pill shadow">
-                    <input type="text" name="search" class="form-control border-0 bg-transparent rounded-pill ps-4" placeholder="Rechercher..." value="<?= htmlspecialchars($search) ?>">
-                    <button class="btn btn-primary rounded-circle" type="submit">🔍</button>
-                    <?php if(!empty($search)): ?><a href="index.php#events" class="btn btn-secondary rounded-circle">✖</a><?php endif; ?>
+                <form method="GET" action="#events" class="d-flex gap-2 p-2 bg-body-tertiary rounded-pill shadow" style="position: relative; z-index: 10;">
+                    <input type="text" name="search" class="form-control border-0 bg-transparent rounded-pill ps-4" placeholder="Rechercher..." value="<?= htmlspecialchars($search) ?>" style="cursor: text;">
+                    <button class="btn btn-primary rounded-circle" type="submit" style="min-width: 45px;">🔍</button>
+                    <?php if(!empty($search)): ?><a href="index.php#events" class="btn btn-secondary rounded-circle" style="min-width: 45px;">✖</a><?php endif; ?>
                 </form>
             </div>
         </div>

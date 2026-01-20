@@ -50,6 +50,9 @@ $events = $pdo->query("SELECT * FROM evenements ORDER BY date_evenement DESC")->
             </table>
         </div>
     </div>
+    
+    <?php include 'footer.php'; ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script_theme.js"></script>
 </body>
