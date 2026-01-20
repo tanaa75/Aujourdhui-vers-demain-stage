@@ -1,29 +1,57 @@
 <?php
+/**
+ * ===========================================
+ * PAGE "NOS ACTIONS" - AIDE AUX DEVOIRS
+ * ===========================================
+ * 
+ * Cette page présente l'action principale de l'association :
+ * l'aide aux devoirs pour les enfants.
+ * 
+ * Fonctionnalités :
+ * - Présentation de la mission
+ * - Informations pratiques (jours, horaires, niveaux)
+ * - Formulaire d'inscription (réservé aux connectés)
+ * 
+ * Le formulaire envoie un message dans la table 'messages'
+ * qui sera visible dans l'espace admin.
+ */
+
+// Démarrage de la session
 session_start();
+
+// Connexion à la base de données
 require_once 'db.php';
+
+// Variable pour suivre si l'inscription a réussi
 $inscription_ok = false;
 
-// Vérification : Membre OU Admin connecté ?
+// Vérification : est-ce qu'un membre OU un admin est connecté ?
 $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 
-// TRAITEMENT (Seulement si connecté)
+// ========== TRAITEMENT DU FORMULAIRE ==========
+// On traite seulement si connecté et si c'est le bon formulaire
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_connecte) {
+    
+    // Vérification du type de formulaire
     if ($_POST['form_type'] == 'devoirs') {
+        // Récupération des données du formulaire
         $nom = $_POST['nom'];
         $prenom = $_POST['prenom'];
         $classe = $_POST['classe'];
         $tel = $_POST['tel'];
         $email = $_POST['email'];
         
+        // Construction du message formaté
         $message_complet = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel\nEmail parent : $email";
         
+        // Insertion en base de données
         $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
         $stmt->execute(["Parent de $prenom", $email, $message_complet]);
         $inscription_ok = true;
     }
 }
 
-// Pré-remplissage (Uniquement si c'est un membre, sinon vide pour l'admin)
+// Pré-remplissage de l'email si l'utilisateur est un membre connecté
 $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 ?>
 <!DOCTYPE html>

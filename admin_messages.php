@@ -1,14 +1,38 @@
 <?php
+/**
+ * ===========================================
+ * MESSAGERIE ADMIN
+ * ===========================================
+ * 
+ * Cette page permet de consulter et gérer tous les messages
+ * reçus via les formulaires du site :
+ * - Messages de contact
+ * - Inscriptions aide aux devoirs
+ * - Candidatures bénévoles
+ * 
+ * Fonctionnalités :
+ * - Liste de tous les messages avec identification du type
+ * - Affichage détaillé de chaque message
+ * - Suppression des messages
+ * - Copie rapide des informations
+ * 
+ * Sécurité :
+ * - Accessible uniquement aux administrateurs
+ */
+
+// Démarrage de la session
 session_start();
+
+// Connexion à la base de données
 require_once 'db.php';
 
-// Vérification de sécurité
+// Vérification de sécurité : redirection si non connecté
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Suppression
+// ========== SUPPRESSION D'UN MESSAGE ==========
 if (isset($_POST['delete_id'])) {
     $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
     $stmt->execute([$_POST['delete_id']]);
@@ -16,7 +40,7 @@ if (isset($_POST['delete_id'])) {
     exit();
 }
 
-// Récupération des messages
+// Récupération de tous les messages (du plus récent au plus ancien)
 $query = $pdo->query("SELECT * FROM messages ORDER BY date_envoi DESC");
 $messages = $query->fetchAll();
 ?>

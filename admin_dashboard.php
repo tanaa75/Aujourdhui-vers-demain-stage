@@ -1,14 +1,45 @@
 <?php
+/**
+ * ===========================================
+ * TABLEAU DE BORD ADMINISTRATEUR
+ * ===========================================
+ * 
+ * Page principale de l'espace admin.
+ * Permet de gérer les événements de l'association.
+ * 
+ * Fonctionnalités :
+ * - Liste de tous les événements
+ * - Bouton pour ajouter un événement
+ * - Boutons pour modifier/supprimer chaque événement
+ * 
+ * Sécurité :
+ * - Accessible uniquement aux administrateurs connectés
+ */
+
+// Démarrage de la session
 session_start();
-if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+
+// Vérification de sécurité : redirection si non connecté
+if (!isset($_SESSION['user_id'])) { 
+    header("Location: login.php"); 
+    exit(); 
+}
+
+// Connexion à la base de données
 require_once 'db.php';
 
+// ========== SUPPRESSION D'UN ÉVÉNEMENT ==========
+// Si le paramètre 'delete' est présent dans l'URL, on supprime l'événement
 if (isset($_GET['delete'])) {
     $stmt = $pdo->prepare("DELETE FROM evenements WHERE id = ?");
     $stmt->execute([$_GET['delete']]);
+    
+    // Redirection avec message de confirmation
     header("Location: admin_dashboard.php?msg=deleted");
     exit();
 }
+
+// Récupération de tous les événements (du plus récent au plus ancien)
 $events = $pdo->query("SELECT * FROM evenements ORDER BY date_evenement DESC")->fetchAll();
 ?>
 <!DOCTYPE html>

@@ -1,21 +1,47 @@
 <?php
+/**
+ * ===========================================
+ * PAGE DE CONTACT
+ * ===========================================
+ * 
+ * Cette page permet aux membres/admins d'envoyer un message
+ * à l'association via un formulaire.
+ * 
+ * Fonctionnalités :
+ * - Formulaire de contact (réservé aux connectés)
+ * - Affichage des coordonnées de l'association
+ * - Carte Google Maps intégrée
+ * 
+ * Sécurité :
+ * - Seuls les utilisateurs connectés peuvent envoyer un message
+ * - Les données sont pré-remplies si l'utilisateur est connecté
+ */
+
+// Démarrage de la session
 session_start();
+
+// Connexion à la base de données
 require_once 'db.php';
+
+// Variable pour suivre si le message a été envoyé
 $msg_envoye = false;
 
-// Vérification : Membre OU Admin connecté ?
+// Vérification : est-ce qu'un membre OU un admin est connecté ?
 $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 
-// TRAITEMENT (Seulement si connecté)
+// ========== TRAITEMENT DU FORMULAIRE ==========
+// On traite seulement si l'utilisateur est connecté
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $est_connecte) {
+    // Vérification que tous les champs sont remplis
     if (!empty($_POST['nom']) && !empty($_POST['email']) && !empty($_POST['message'])) {
+        // Insertion du message en base de données
         $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
         $stmt->execute([$_POST['nom'], $_POST['email'], $_POST['message']]);
         $msg_envoye = true;
     }
 }
 
-// Pré-remplissage
+// Pré-remplissage des champs avec les infos du membre connecté
 $nom_user = isset($_SESSION['membre_nom']) ? $_SESSION['membre_nom'] : "";
 $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 ?>

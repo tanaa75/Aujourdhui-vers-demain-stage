@@ -1,30 +1,59 @@
 <?php
+/**
+ * ===========================================
+ * AJOUTER UN ÉVÉNEMENT
+ * ===========================================
+ * 
+ * Cette page permet de créer un nouvel événement.
+ * 
+ * Fonctionnalités :
+ * - Formulaire avec titre, date, description
+ * - Upload d'image optionnel
+ * - Lieu fixé automatiquement (siège de l'association)
+ * 
+ * Sécurité :
+ * - Accessible uniquement aux administrateurs
+ * - Vérification du type et de la taille des images
+ */
+
+// Démarrage de la session
 session_start();
-// Vérification de sécurité
-if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+
+// Vérification de sécurité : redirection si non connecté
+if (!isset($_SESSION['user_id'])) { 
+    header("Location: login.php"); 
+    exit(); 
+}
+
+// Connexion à la base de données
 require_once 'db.php';
 
+// Variable pour les messages
 $message = "";
 
+// ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupération des données
     $titre = $_POST['titre'];
     $description = $_POST['description'];
     $date = $_POST['date_evenement'];
-    $lieu = "116 rue de l'Avenir, 93130 Noisy-le-Sec"; // On force l'adresse ici aussi pour la sécurité
     
-    // --- GESTION DE L'IMAGE ---
+    // Lieu fixé automatiquement pour la sécurité
+    $lieu = "116 rue de l'Avenir, 93130 Noisy-le-Sec";
+    
+    // ========== GESTION DE L'IMAGE ==========
     $image_filename = NULL; // Par défaut, pas d'image
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        // On vérifie que c'est bien une image
+        // Extensions autorisées
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
         
         if (in_array($ext, $allowed)) {
-            // On renomme pour éviter les conflits (event_timestamp.jpg)
+            // Renommage pour éviter les conflits
             $new_name = "event_" . time() . "." . $ext;
             
-            // On déplace le fichier
+            // Déplacement du fichier
             if (move_uploaded_file($_FILES['image']['tmp_name'], "uploads/" . $new_name)) {
                 $image_filename = $new_name;
             }
@@ -33,13 +62,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Si pas d'erreur critique, on enregistre
+    // Si pas d'erreur, on enregistre l'événement
     if (strpos($message, 'alert-warning') === false) {
         try {
             $stmt = $pdo->prepare("INSERT INTO evenements (titre, description, date_evenement, lieu, image) VALUES (?, ?, ?, ?, ?)");
             $stmt->execute([$titre, $description, $date, $lieu, $image_filename]);
             
-            // Redirection vers le dashboard avec succès
+            // Redirection avec message de succès
             header("Location: admin_dashboard.php?msg=added");
             exit();
         } catch (PDOException $e) {

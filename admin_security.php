@@ -1,34 +1,66 @@
 <?php
+/**
+ * ===========================================
+ * PAGE SÉCURITÉ ADMIN
+ * ===========================================
+ * 
+ * Cette page permet à l'administrateur de changer
+ * son mot de passe.
+ * 
+ * Étapes de sécurité :
+ * 1. Vérification de l'ancien mot de passe
+ * 2. Confirmation du nouveau mot de passe
+ * 3. Hashage sécurisé avant enregistrement
+ * 
+ * Sécurité :
+ * - Accessible uniquement aux administrateurs
+ * - Le mot de passe est hashé avec password_hash()
+ */
+
+// Démarrage de la session
 session_start();
-// Vérification de sécurité : si pas connecté, on renvoie au login
-if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+
+// Vérification de sécurité : redirection si non connecté
+if (!isset($_SESSION['user_id'])) { 
+    header("Location: login.php"); 
+    exit(); 
+}
+
+// Connexion à la base de données
 require_once 'db.php';
 
+// Variable pour les messages (succès ou erreur)
 $message = "";
 
+// ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupération des données du formulaire
     $current_pass = $_POST['current_password'];
     $new_pass = $_POST['new_password'];
     $confirm_pass = $_POST['confirm_password'];
 
-    // 1. On récupère les infos de l'admin connecté
+    // Étape 1 : Récupérer les infos de l'admin connecté
     $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch();
 
-    // 2. On vérifie l'ancien mot de passe
+    // Étape 2 : Vérifier l'ancien mot de passe
     if (!password_verify($current_pass, $user['mot_de_passe'])) {
         $message = "<div class='alert alert-danger border-0 shadow-sm'><i class='bi bi-x-circle-fill me-2'></i> L'ancien mot de passe est incorrect.</div>";
     } 
-    // 3. On vérifie que les deux nouveaux sont pareils
+    // Étape 3 : Vérifier que les deux nouveaux sont identiques
     elseif ($new_pass !== $confirm_pass) {
         $message = "<div class='alert alert-danger border-0 shadow-sm'><i class='bi bi-exclamation-triangle-fill me-2'></i> Les nouveaux mots de passe ne correspondent pas.</div>";
     } 
-    // 4. Si tout est bon, on met à jour !
+    // Étape 4 : Tout est bon, on met à jour !
     else {
+        // Hashage du nouveau mot de passe
         $new_hash = password_hash($new_pass, PASSWORD_DEFAULT);
+        
+        // Mise à jour en base de données
         $stmt = $pdo->prepare("UPDATE utilisateurs SET mot_de_passe = ? WHERE id = ?");
         $stmt->execute([$new_hash, $_SESSION['user_id']]);
+        
         $message = "<div class='alert alert-success border-0 shadow-sm'><i class='bi bi-check-circle-fill me-2'></i> Mot de passe modifié avec succès !</div>";
     }
 }

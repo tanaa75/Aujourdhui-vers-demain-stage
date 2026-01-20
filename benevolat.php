@@ -1,15 +1,39 @@
 <?php
-session_start();
-require_once 'db.php';
-$benevole_ok = false;
-$error_msg = "";
+/**
+ * ===========================================
+ * PAGE BÉNÉVOLAT - DEVENIR BÉNÉVOLE
+ * ===========================================
+ * 
+ * Cette page permet aux visiteurs de postuler comme bénévole.
+ * 
+ * Fonctionnalités :
+ * - Présentation des besoins de l'association
+ * - Formulaire de candidature avec upload de CV
+ * - Gestion sécurisée des fichiers uploadés
+ * 
+ * Sécurité :
+ * - Seuls les utilisateurs connectés peuvent postuler
+ * - Les fichiers sont vérifiés (type et taille)
+ */
 
-// Vérification : Membre OU Admin connecté ?
+// Démarrage de la session
+session_start();
+
+// Connexion à la base de données
+require_once 'db.php';
+
+// Variables de suivi
+$benevole_ok = false;     // Candidature envoyée ?
+$error_msg = "";          // Message d'erreur éventuel
+
+// Vérification : est-ce qu'un membre OU un admin est connecté ?
 $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 
-// TRAITEMENT (Seulement si connecté)
+// ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_connecte) {
+    
     if ($_POST['form_type'] == 'benevolat') {
+        // Récupération des données
         $nom = $_POST['nom'];
         $email = $_POST['email'];
         $tel = $_POST['tel'];
@@ -18,21 +42,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
         
         $lien_cv = "Aucun CV fourni";
         
+        // ========== GESTION DE L'UPLOAD DU CV ==========
         if (isset($_FILES['cv']) && $_FILES['cv']['error'] == 0) {
+            
+            // Vérification de la taille (max 5 Mo)
             if ($_FILES['cv']['size'] <= 5000000) {
+                
+                // Récupération de l'extension
                 $fileInfo = pathinfo($_FILES['cv']['name']);
                 $extension = strtolower($fileInfo['extension']);
+                
+                // Extensions autorisées
                 $allowedExtensions = ['pdf', 'doc', 'docx', 'jpg', 'png'];
                 
                 if (in_array($extension, $allowedExtensions)) {
+                    // Renommage du fichier pour éviter les conflits
                     $new_filename = 'cv_' . preg_replace('/[^a-zA-Z0-9]/', '', $nom) . '_' . time() . '.' . $extension;
+                    
+                    // Déplacement du fichier dans le dossier uploads
                     if (move_uploaded_file($_FILES['cv']['tmp_name'], 'uploads/' . $new_filename)) {
                         $lien_cv = "📄 TÉLÉCHARGER LE CV : http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/uploads/" . $new_filename;
-                    } else { $error_msg = "Erreur upload."; }
-                } else { $error_msg = "Format non supporté."; }
-            } else { $error_msg = "Fichier trop lourd."; }
+                    } else { 
+                        $error_msg = "Erreur upload."; 
+                    }
+                } else { 
+                    $error_msg = "Format non supporté."; 
+                }
+            } else { 
+                $error_msg = "Fichier trop lourd."; 
+            }
         }
 
+        // Si pas d'erreur, on enregistre la candidature
         if (empty($error_msg)) {
             $msg_complet = "❤️ NOUVEAU BÉNÉVOLE !\n\nNom : $nom\nEmail : $email\nTéléphone : $tel\n\nDispos : $dispo\nAime faire : $skills\n\n$lien_cv";
             $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
@@ -42,7 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
     }
 }
 
-// Pré-remplissage (Seulement pour membres)
+// Pré-remplissage des champs pour les membres connectés
 $nom_user = isset($_SESSION['membre_nom']) ? $_SESSION['membre_nom'] : "";
 $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 ?>

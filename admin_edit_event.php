@@ -1,34 +1,66 @@
 <?php
+/**
+ * ===========================================
+ * MODIFIER UN ÉVÉNEMENT
+ * ===========================================
+ * 
+ * Cette page permet de modifier un événement existant.
+ * 
+ * Fonctionnalités :
+ * - Pré-remplissage des champs avec les données actuelles
+ * - Modification du titre, date, description
+ * - Remplacement optionnel de l'image
+ * 
+ * Sécurité :
+ * - Accessible uniquement aux administrateurs
+ * - Vérification que l'événement existe
+ */
+
+// Démarrage de la session
 session_start();
-// Vérification de sécurité
-if (!isset($_SESSION['user_id'])) { header("Location: login.php"); exit(); }
+
+// Vérification de sécurité : redirection si non connecté
+if (!isset($_SESSION['user_id'])) { 
+    header("Location: login.php"); 
+    exit(); 
+}
+
+// Connexion à la base de données
 require_once 'db.php';
 
-// Vérifier si un ID est passé dans l'URL
-if (!isset($_GET['id'])) { header("Location: admin_dashboard.php"); exit(); }
+// Vérification qu'un ID est passé dans l'URL
+if (!isset($_GET['id'])) { 
+    header("Location: admin_dashboard.php"); 
+    exit(); 
+}
 
-// Récupérer l'événement actuel
+// Récupération de l'événement à modifier
 $stmt = $pdo->prepare("SELECT * FROM evenements WHERE id = ?");
 $stmt->execute([$_GET['id']]);
 $event = $stmt->fetch();
 
-// Si l'événement n'existe pas
-if (!$event) { header("Location: admin_dashboard.php"); exit(); }
+// Si l'événement n'existe pas, retour au dashboard
+if (!$event) { 
+    header("Location: admin_dashboard.php"); 
+    exit(); 
+}
 
+// Variable pour les messages
 $message = "";
 
-// TRAITEMENT DU FORMULAIRE DE MODIFICATION
+// ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupération des données
     $titre = $_POST['titre'];
     $description = $_POST['description'];
     $date = $_POST['date_evenement'];
-    $lieu = "116 rue de l'Avenir, 93130 Noisy-le-Sec"; // Adresse fixe
+    $lieu = "116 rue de l'Avenir, 93130 Noisy-le-Sec";
     
-    // --- GESTION DE L'IMAGE (Mise à jour) ---
-    $image_sql = ""; // Par défaut, on ne touche pas à l'image
-    $params = [$titre, $description, $date, $lieu]; // Paramètres de base
+    // ========== GESTION DE L'IMAGE ==========
+    $image_sql = "";           // Par défaut, on ne touche pas à l'image
+    $params = [$titre, $description, $date, $lieu];
 
-    // Si une NOUVELLE image est envoyée
+    // Si une nouvelle image est envoyée
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
@@ -36,23 +68,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (in_array($ext, $allowed)) {
             $new_name = "event_" . time() . "." . $ext;
             if (move_uploaded_file($_FILES['image']['tmp_name'], "uploads/" . $new_name)) {
-                // On ajoute la mise à jour de l'image à la requête SQL
+                // On ajoute la mise à jour de l'image à la requête
                 $image_sql = ", image = ?";
-                $params[] = $new_name; // On ajoute le nom du fichier aux paramètres
+                $params[] = $new_name;
             }
         }
     }
 
-    // On ajoute l'ID à la fin des paramètres pour le WHERE
+    // Ajout de l'ID pour la clause WHERE
     $params[] = $_GET['id'];
 
     try {
-        // Requête dynamique (change selon si on a une image ou pas)
+        // Requête dynamique selon si on a une nouvelle image ou pas
         $sql = "UPDATE evenements SET titre=?, description=?, date_evenement=?, lieu=? $image_sql WHERE id=?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         
-        // Redirection succès
+        // Redirection avec message de succès
         header("Location: admin_dashboard.php?msg=updated");
         exit();
     } catch (PDOException $e) {

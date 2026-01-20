@@ -1,23 +1,49 @@
 <?php
+/**
+ * ===========================================
+ * PAGE DE CONNEXION ADMINISTRATEUR
+ * ===========================================
+ * 
+ * Cette page permet aux ADMINISTRATEURS de se connecter.
+ * Elle vérifie les identifiants dans la table 'utilisateurs'.
+ * 
+ * Différence avec connexion.php :
+ * - login.php = pour les ADMINISTRATEURS (gestion du site)
+ * - connexion.php = pour les MEMBRES (utilisateurs normaux)
+ */
+
+// Démarrage de la session
 session_start();
+
+// Connexion à la base de données
 require_once 'db.php';
 
-// On initialise la variable pour éviter l'erreur "Undefined variable"
+// Variable pour les erreurs
 $error_msg = "";
 
+// ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // Récupération des données
     $identifiant = $_POST['identifiant'];
     $mot_de_passe = $_POST['mot_de_passe'];
 
+    // Recherche de l'administrateur dans la base
     $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE identifiant = ?");
     $stmt->execute([$identifiant]);
     $user = $stmt->fetch();
 
+    // Vérification du mot de passe
     if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
+        
+        // Connexion réussie : stockage en session
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['identifiant'] = $user['identifiant'];
+        
+        // Redirection vers le tableau de bord admin
         header("Location: admin_dashboard.php");
         exit();
+        
     } else {
         $error_msg = "Identifiant ou mot de passe incorrect.";
     }
@@ -40,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display: flex;
             align-items: center;
             justify-content: center;
-            /* MÊME IMAGE DE FOND POUR LA COHÉRENCE */
+            /* Image de fond différente pour distinguer l'espace admin */
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
             background-size: cover;
             background-position: center;
@@ -48,7 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .card-custom {
-            /* EFFET GLASSMORPHISM */
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -60,14 +85,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
+    <!-- Carte de connexion admin -->
     <div class="card card-custom shadow-lg p-4 p-md-5">
         
+        <!-- En-tête avec icône de sécurité -->
         <div class="text-center mb-4">
             <i class="bi bi-shield-lock-fill text-primary" style="font-size: 3rem;"></i>
             <h3 class="fw-bold text-primary mt-2">Espace Admin</h3>
             <p class="text-muted small">Accès sécurisé réservé à la gestion</p>
         </div>
 
+        <!-- Affichage des erreurs -->
         <?php if (!empty($error_msg)): ?>
             <div class="alert alert-danger d-flex align-items-center mb-4 border-0 shadow-sm" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -75,8 +103,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         <?php endif; ?>
 
+        <!-- Formulaire de connexion -->
         <form method="POST">
-            
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-4" id="identifiant" name="identifiant" placeholder="Admin" required>
                 <label for="identifiant"><i class="bi bi-person-badge"></i> Identifiant</label>
@@ -92,6 +120,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </button>
         </form>
 
+        <!-- Lien retour -->
         <div class="text-center mt-4">
             <a href="index.php" class="btn btn-outline-secondary rounded-pill py-2 px-4 fw-bold border-2">
                 <i class="bi bi-arrow-left"></i> Retour au site public

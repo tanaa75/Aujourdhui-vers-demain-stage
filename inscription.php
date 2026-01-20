@@ -1,28 +1,54 @@
 <?php
+/**
+ * ===========================================
+ * PAGE D'INSCRIPTION MEMBRE
+ * ===========================================
+ * 
+ * Cette page permet aux visiteurs de créer un compte membre.
+ * Les données sont enregistrées dans la table 'membres'.
+ * Le mot de passe est hashé avec password_hash() pour la sécurité.
+ */
+
+// Connexion à la base de données
 require_once 'db.php';
+
+// Variable pour stocker les messages (succès ou erreur)
 $message = "";
 
+// ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // Récupération et sécurisation des données
+    // htmlspecialchars() protège contre les attaques XSS
     $nom = htmlspecialchars($_POST['nom']);
     $email = htmlspecialchars($_POST['email']);
+    
+    // Hashage du mot de passe pour la sécurité
+    // Ne jamais stocker un mot de passe en clair !
     $password = password_hash($_POST['mot_de_passe'], PASSWORD_DEFAULT);
 
-    // Vérifier si l'email existe déjà
+    // Vérification si l'email existe déjà en base
     $stmt = $pdo->prepare("SELECT id FROM membres WHERE email = ?");
     $stmt->execute([$email]);
     
     if ($stmt->fetch()) {
+        // L'email est déjà utilisé
         $message = "<div class='alert alert-warning text-center border-0 shadow-sm'>⚠️ Cet email est déjà utilisé.</div>";
     } else {
+        // Insertion du nouveau membre en base de données
         $stmt = $pdo->prepare("INSERT INTO membres (nom, email, mot_de_passe) VALUES (?, ?, ?)");
+        
         if ($stmt->execute([$nom, $email, $password])) {
+            // Inscription réussie
             $message = "<div class='alert alert-success text-center border-0 shadow-sm'>✅ Compte créé ! <a href='connexion.php' class='fw-bold text-decoration-none'>Connectez-vous ici</a>.</div>";
         } else {
+            // Erreur technique
             $message = "<div class='alert alert-danger text-center border-0 shadow-sm'>❌ Une erreur technique est survenue.</div>";
         }
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr" data-bs-theme="light">
 <head>
@@ -33,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     
     <style>
+        /* Page centrée */
         body {
             height: 100vh;
             display: flex;
@@ -45,14 +72,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-attachment: fixed;
         }
 
+        /* Carte avec effet glassmorphism */
         .card-custom {
-            /* Effet Glassmorphism */
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             border: none;
             width: 100%;
-            max-width: 450px; /* Un peu plus large pour l'inscription */
+            max-width: 450px;
         }
         
         .form-control-lg {
@@ -63,15 +90,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
+    <!-- Carte d'inscription -->
     <div class="card card-custom shadow-lg p-4 p-md-5">
+        
+        <!-- En-tête -->
         <div class="text-center mb-4">
             <img src="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" width="60" class="mb-3">
             <h3 class="fw-bold text-primary">Créer un compte</h3>
             <p class="text-muted small">Rejoignez l'association en quelques clics</p>
         </div>
         
+        <!-- Affichage des messages -->
         <?= $message ?>
 
+        <!-- Formulaire d'inscription -->
         <form method="POST">
             <div class="form-floating mb-3">
                 <input type="text" name="nom" class="form-control rounded-4" id="nomInput" placeholder="Jean Dupont" required>
@@ -93,6 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </button>
         </form>
 
+        <!-- Liens supplémentaires -->
         <div class="d-grid gap-2 text-center mt-4">
             <a href="connexion.php" class="btn btn-outline-secondary rounded-pill py-2 fw-bold border-2">
                 Déjà membre ? Se connecter
