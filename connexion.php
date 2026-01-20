@@ -18,6 +18,9 @@ session_start();
 // Connexion à la base de données
 require_once 'db.php';
 
+// Inclusion des fonctions de sécurité
+require_once 'security.php';
+
 // Variable pour stocker les erreurs
 $error = "";
 
@@ -28,28 +31,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupération des données du formulaire
     $email = $_POST['email'];
     $password = $_POST['mot_de_passe'];
+    
+    // Vérification du token CSRF
+    if (!isset($_POST['csrf_token']) || !verifier_token_csrf($_POST['csrf_token'])) {
+        $error = "Erreur de sécurité. Veuillez réessayer.";
+    }
+    // Vérification si l'utilisateur est bloqué
+    elseif (est_connexion_bloquee($email)) {
+        $minutes = ceil(temps_restant_blocage($email) / 60);
+        $error = "Trop de tentatives. Réessayez dans $minutes minutes.";
+    }
+    else {
+        // Recherche du membre dans la base de données par son email
+        $stmt = $pdo->prepare("SELECT * FROM membres WHERE email = ?");
+        $stmt->execute([$email]);
+        $membre = $stmt->fetch();
 
-    // Recherche du membre dans la base de données par son email
-    $stmt = $pdo->prepare("SELECT * FROM membres WHERE email = ?");
-    $stmt->execute([$email]);
-    $membre = $stmt->fetch();
-
-    // Vérification du mot de passe avec password_verify()
-    // (compare le mot de passe saisi avec le hash stocké en base)
-    if ($membre && password_verify($password, $membre['mot_de_passe'])) {
-        
-        // Connexion réussie : on stocke les infos en session
-        $_SESSION['membre_id'] = $membre['id'];
-        $_SESSION['membre_nom'] = $membre['nom'];
-        $_SESSION['membre_email'] = $membre['email'];
-        
-        // Redirection vers la page d'accueil
-        header("Location: index.php");
-        exit();
-        
-    } else {
-        // Échec : email ou mot de passe incorrect
-        $error = "Email ou mot de passe incorrect.";
+        // Vérification du mot de passe avec password_verify()
+        if ($membre && password_verify($password, $membre['mot_de_passe'])) {
+            
+            // Connexion réussie : réinitialiser les tentatives
+            reinitialiser_tentatives($email);
+            regenerer_token_csrf();
+            
+            // Stocker les infos en session
+            $_SESSION['membre_id'] = $membre['id'];
+            $_SESSION['membre_nom'] = $membre['nom'];
+            $_SESSION['membre_email'] = $membre['email'];
+            
+            // Redirection vers la page d'accueil
+            header("Location: index.php");
+            exit();
+            
+        } else {
+            // Échec : enregistrer la tentative
+            enregistrer_tentative_echec($email);
+            $error = "Email ou mot de passe incorrect.";
+        }
     }
 }
 ?>
@@ -107,6 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Formulaire de connexion -->
         <form method="POST">
+            <?= champ_csrf() ?>
             <div class="form-floating mb-3">
                 <input type="email" name="email" class="form-control rounded-4" id="floatingInput" placeholder="name@example.com" required>
                 <label for="floatingInput">Adresse Email</label>
@@ -120,6 +139,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 Se connecter
             </button>
         </form>
+        
+        <!-- Mot de passe oublié -->
+        <div class="text-center mt-3">
+            <a href="mot_de_passe_oublie.php" class="text-decoration-none text-muted small">
+                <i class="bi bi-key"></i> Mot de passe oublié ?
+            </a>
+        </div>
 
         <!-- Liens supplémentaires -->
         <div class="d-grid gap-2 text-center mt-4">

@@ -1,4 +1,26 @@
-<?php session_start(); ?>
+<?php 
+/**
+ * ===========================================
+ * PAGE MENTIONS LÉGALES
+ * ===========================================
+ * 
+ * Page obligatoire pour tout site web.
+ * Contient les informations légales de l'association.
+ * 
+ * SECTIONS :
+ * 1. Éditeur du site
+ * 2. Hébergement
+ * 3. Propriété intellectuelle
+ * 4. Données personnelles
+ * 5. Cookies
+ * 6. Droit applicable
+ * 
+ * DESIGN :
+ * - Cartes numérotées avec hover
+ * - Adaptation mode clair/sombre
+ */
+session_start(); 
+?>
 <!DOCTYPE html>
 <html lang="fr" data-bs-theme="light">
 <head>

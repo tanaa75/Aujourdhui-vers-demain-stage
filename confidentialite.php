@@ -1,4 +1,28 @@
-<?php session_start(); ?>
+<?php 
+/**
+ * ===========================================
+ * PAGE POLITIQUE DE CONFIDENTIALITÉ
+ * ===========================================
+ * 
+ * Page obligatoire RGPD.
+ * Explique comment les données personnelles sont collectées,
+ * utilisées et protégées.
+ * 
+ * SECTIONS :
+ * 1. Données collectées
+ * 2. Utilisation des données
+ * 3. Conservation des données
+ * 4. Droits des utilisateurs
+ * 5. Sécurité
+ * 6. Cookies
+ * 
+ * DESIGN :
+ * - Cartes numérotées avec thème vert
+ * - Liste avec checkmarks
+ * - Adaptation mode clair/sombre
+ */
+session_start(); 
+?>
 <!DOCTYPE html>
 <html lang="fr" data-bs-theme="light">
 <head>

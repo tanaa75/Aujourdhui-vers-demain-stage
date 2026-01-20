@@ -18,6 +18,9 @@ session_start();
 // Connexion à la base de données
 require_once 'db.php';
 
+// Inclusion des fonctions de sécurité
+require_once 'security.php';
+
 // Variable pour les erreurs
 $error_msg = "";
 
@@ -27,25 +30,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Récupération des données
     $identifiant = $_POST['identifiant'];
     $mot_de_passe = $_POST['mot_de_passe'];
+    
+    // Vérification du token CSRF
+    if (!isset($_POST['csrf_token']) || !verifier_token_csrf($_POST['csrf_token'])) {
+        $error_msg = "Erreur de sécurité. Veuillez réessayer.";
+    }
+    // Vérification si l'utilisateur est bloqué
+    elseif (est_connexion_bloquee($identifiant)) {
+        $minutes = ceil(temps_restant_blocage($identifiant) / 60);
+        $error_msg = "Trop de tentatives. Réessayez dans $minutes minutes.";
+    }
+    else {
+        // Recherche de l'administrateur dans la base
+        $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE identifiant = ?");
+        $stmt->execute([$identifiant]);
+        $user = $stmt->fetch();
 
-    // Recherche de l'administrateur dans la base
-    $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE identifiant = ?");
-    $stmt->execute([$identifiant]);
-    $user = $stmt->fetch();
-
-    // Vérification du mot de passe
-    if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
-        
-        // Connexion réussie : stockage en session
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['identifiant'] = $user['identifiant'];
-        
-        // Redirection vers le tableau de bord admin
-        header("Location: admin_dashboard.php");
-        exit();
-        
-    } else {
-        $error_msg = "Identifiant ou mot de passe incorrect.";
+        // Vérification du mot de passe
+        if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
+            
+            // Connexion réussie : réinitialiser les tentatives
+            reinitialiser_tentatives($identifiant);
+            regenerer_token_csrf();
+            
+            // Stockage en session
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['identifiant'] = $user['identifiant'];
+            
+            // Redirection vers le tableau de bord admin
+            header("Location: admin_dashboard.php");
+            exit();
+            
+        } else {
+            // Échec : enregistrer la tentative
+            enregistrer_tentative_echec($identifiant);
+            $error_msg = "Identifiant ou mot de passe incorrect.";
+        }
     }
 }
 ?>
@@ -105,6 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Formulaire de connexion -->
         <form method="POST">
+            <?= champ_csrf() ?>
             <div class="form-floating mb-3">
                 <input type="text" class="form-control rounded-4" id="identifiant" name="identifiant" placeholder="Admin" required>
                 <label for="identifiant"><i class="bi bi-person-badge"></i> Identifiant</label>

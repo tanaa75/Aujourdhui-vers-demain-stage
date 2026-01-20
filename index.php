@@ -1,32 +1,69 @@
 <?php
+/**
+ * ===========================================
+ * PAGE D'ACCUEIL - AUJOURD'HUI VERS DEMAIN
+ * ===========================================
+ * 
+ * Fichier principal du site de l'association.
+ * Affiche toutes les sections importantes.
+ * 
+ * SECTIONS :
+ * - Hero Banner (Bannière d'accueil)
+ * - Statistiques animées (Bénévoles, Enfants, Création)
+ * - Qui sommes-nous ? (Présentation)
+ * - Nos Actions (Aide aux devoirs + formulaire inscription)
+ * - Rejoignez l'équipe (Bénévolat + formulaire candidature)
+ * - Nos Actualités (Événements + recherche)
+ * 
+ * FORMULAIRES :
+ * - Inscription aide aux devoirs → envoi vers table 'messages'
+ * - Candidature bénévole → envoi vers table 'messages' + upload CV
+ * 
+ * SÉCURITÉ :
+ * - Formulaires accessibles uniquement aux utilisateurs connectés
+ * - Upload CV : vérification type et taille
+ */
+
+// Démarrage de la session
 session_start(); 
+
+// Connexion à la base de données
 require_once 'db.php';
 
-// --- LOGIQUE TRAITEMENT (PROTECTION SESSION) ---
-$inscription_ok = false;
-$benevole_ok = false;
-$error_msg = "";
+// ========== VARIABLES DE SUIVI ==========
+$inscription_ok = false;   // Inscription devoirs réussie ?
+$benevole_ok = false;      // Candidature bénévole réussie ?
+$error_msg = "";           // Message d'erreur éventuel
 
-// On vérifie si MEMBRE OU ADMIN est connecté
+// Vérification si un utilisateur est connecté (membre OU admin)
 $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 
-// On ne traite les formulaires QUE si connecté
+// ========== TRAITEMENT DES FORMULAIRES ==========
+// On ne traite les formulaires QUE si l'utilisateur est connecté
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_connecte) {
     
-    // CAS 1 : DEVOIRS
+    // ------------------------------------------
+    // CAS 1 : INSCRIPTION AIDE AUX DEVOIRS
+    // ------------------------------------------
     if ($_POST['form_type'] == 'devoirs') {
         $nom = $_POST['nom'];
         $prenom = $_POST['prenom'];
         $classe = $_POST['classe'];
         $tel = $_POST['tel'];
         $email = $_POST['email'];
+        
+        // Construction du message formaté
         $msg = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel\nEmail parent : $email";
+        
+        // Insertion en base de données
         $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
         $stmt->execute(["Parent de $prenom", $email, $msg]);
         $inscription_ok = true;
     }
 
-    // CAS 2 : BENEVOLAT
+    // ------------------------------------------
+    // CAS 2 : CANDIDATURE BÉNÉVOLE
+    // ------------------------------------------
     if ($_POST['form_type'] == 'benevolat') {
         $nom = $_POST['nom'];
         $email = $_POST['email'];
@@ -35,19 +72,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
         $skills = $_POST['skills'];
         
         $lien_cv = "Aucun CV fourni";
-        // Gestion Upload CV
+        
+        // Gestion de l'upload du CV
         if (isset($_FILES['cv']) && $_FILES['cv']['error'] == 0) {
+            // Vérification taille (max 5 Mo)
             if ($_FILES['cv']['size'] <= 5000000) {
                 $ext = strtolower(pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION));
+                
+                // Vérification extension
                 if (in_array($ext, ['pdf', 'doc', 'docx', 'jpg', 'png'])) {
+                    // Renommage sécurisé
                     $newname = 'cv_' . preg_replace('/[^a-zA-Z0-9]/', '', $nom) . '_' . time() . '.' . $ext;
+                    
+                    // Déplacement dans le dossier uploads
                     if(move_uploaded_file($_FILES['cv']['tmp_name'], 'uploads/' . $newname)) {
                         $lien_cv = "📄 TÉLÉCHARGER LE CV : http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/uploads/" . $newname;
                     }
-                } else { $error_msg = "Format invalide."; }
-            } else { $error_msg = "Fichier trop lourd."; }
+                } else { 
+                    $error_msg = "Format invalide."; 
+                }
+            } else { 
+                $error_msg = "Fichier trop lourd."; 
+            }
         }
 
+        // Si pas d'erreur, on enregistre la candidature
         if (empty($error_msg)) {
             $msg = "❤️ NOUVEAU BÉNÉVOLE !\n\nNom : $nom\nEmail : $email\nTéléphone : $tel\n\nDispos : $dispo\nAime faire : $skills\n\n$lien_cv";
             $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
@@ -57,18 +106,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
     }
 }
 
-// Données utilisateur pour pré-remplissage (Seulement si Membre, sinon vide pour Admin)
+// ========== PRÉ-REMPLISSAGE DES FORMULAIRES ==========
+// Si l'utilisateur est un membre connecté, on récupère ses infos
 $nom_user = isset($_SESSION['membre_nom']) ? $_SESSION['membre_nom'] : "";
 $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
-// Recherche Événements
+// ========== RÉCUPÉRATION DES ÉVÉNEMENTS ==========
 $search = "";
 if (isset($_GET['search']) && !empty($_GET['search'])) {
+    // Recherche par mot-clé
     $search = trim($_GET['search']);
     $stmt = $pdo->prepare("SELECT * FROM evenements WHERE titre LIKE :s OR description LIKE :s OR lieu LIKE :s ORDER BY date_evenement DESC");
     $stmt->execute(['s' => "%$search%"]);
     $events = $stmt->fetchAll();
 } else {
+    // Tous les événements
     $events = $pdo->query("SELECT * FROM evenements ORDER BY date_evenement DESC")->fetchAll();
 }
 ?>

@@ -1,10 +1,30 @@
+<!--
+===========================================
+FOOTER - PIED DE PAGE
+===========================================
+
+Ce fichier contient le pied de page du site.
+Il est inclus dans toutes les pages via include 'footer.php'.
+
+SECTIONS :
+- Logo et description de l'association
+- Liens de navigation
+- Coordonnées de contact (📍 adresse, ✉️ email, 📞 téléphone)
+- Newsletter (formulaire d'inscription)
+- Liens réseaux sociaux
+- Mentions légales et confidentialité
+
+STYLES :
+- Design premium avec ligne gradient animée
+- Adaptation automatique mode clair/sombre
+- Boutons sociaux circulaires avec hover
+-->
+
 <footer class="footer-premium position-relative" style="margin-top: auto; overflow: hidden;">
     
     <!-- Ligne décorative gradient animée -->
     <div class="footer-gradient-top"></div>
     
-
-
     <div class="container position-relative" style="z-index: 2;">
         <div class="row g-4 py-5">
             
