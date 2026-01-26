@@ -203,9 +203,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
     <div class="actions-section py-5">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-down">
-                <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3 shadow-sm">
-                    📚 Nos Actions
-                </span>
+                
                 <h2 class="display-5 fw-bold mb-3">L'Aide aux Devoirs</h2>
                 <p class="lead actions-subtitle">Accompagner chaque enfant vers la réussite</p>
             </div>

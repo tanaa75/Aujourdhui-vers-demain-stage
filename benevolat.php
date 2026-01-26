@@ -253,9 +253,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
             <div class="row align-items-center g-5">
                 <div class="col-lg-6" data-aos="fade-right">
                     <div class="mb-4">
-                        <span class="badge bg-primary bg-gradient px-3 py-2 rounded-pill mb-3 shadow-sm">
-                            <i class="bi bi-heart-fill"></i> Rejoignez-nous
-                        </span>
+                        
                         <h2 class="display-5 fw-bold mb-3">Rejoignez l'aventure !</h2>
                         <p class="lead benevolat-text mb-4">
                             Devenir bénévole, c'est choisir de consacrer un peu de son temps pour faire une grande différence dans la vie du quartier.
