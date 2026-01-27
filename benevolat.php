@@ -92,9 +92,12 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 <html lang="fr" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nous Rejoindre - Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="mobile-responsive.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         body { transition: background-color 0.5s; }
@@ -261,7 +264,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                     </div>
                     
                     <div class="alert benevolat-alert border-start border-primary border-4 shadow-sm mb-4" role="alert">
-                        <p class="mb-2 fw-semibold">💡 Aucune expertise requise !</p>
+                        <p class="mb-2 fw-semibold"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Aucune expertise requise !</p>
                         <p class="small benevolat-alert-text mb-0">Ce qui compte, c'est votre envie d'être utile et de partager un moment avec la communauté.</p>
                     </div>
                     
@@ -275,7 +278,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">📚</span>
+                                            <i class="bi bi-book-fill fs-4 text-white"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -291,7 +294,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">💻</span>
+                                            <i class="bi bi-laptop fs-4 text-white"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -307,7 +310,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-warning bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">🎪</span>
+                                            <i class="bi bi-balloon-fill fs-4 text-dark"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -323,7 +326,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">🎨</span>
+                                            <i class="bi bi-palette-fill fs-4 text-white"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -348,7 +351,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                     <div class="card shadow-lg border-0 rounded-4 overflow-hidden volunteer-form-card">
                         <div class="card-header bg-gradient text-white text-center py-4 border-0" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
                             <div class="mb-2">
-                                <span class="fs-1">🚀</span>
+                                <i class="bi bi-rocket-takeoff-fill fs-1"></i>
                             </div>
                             <h3 class="mb-1 fw-bold form-header-title">Je me lance !</h3>
                             <p class="small mb-0 fw-semibold form-header-subtitle">Remplissez le formulaire ci-dessous</p>
@@ -358,10 +361,10 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                         <?php if ($est_connecte): ?>
                             
                             <?php if ($benevole_ok): ?>
-                                <div class="alert alert-success">👏 Candidature envoyée !</div>
+                                <div class="alert alert-success"><i class="bi bi-hand-thumbs-up-fill me-2"></i>Candidature envoyée !</div>
                             <?php endif; ?>
                             <?php if (!empty($error_msg)): ?>
-                                <div class="alert alert-danger">⚠️ <?= $error_msg ?></div>
+                                <div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i><?= $error_msg ?></div>
                             <?php endif; ?>
 
                             <form method="POST" enctype="multipart/form-data">
@@ -403,7 +406,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
                         <?php else: ?>
                             <div class="text-center py-4">
-                                <div class="mb-3 display-4">🔒</div>
+                                <div class="mb-3 display-4"><i class="bi bi-lock-fill text-secondary"></i></div>
                                 <h5 class="fw-bold">Espace réservé</h5>
                                 <p class="text-muted mb-4">Vous devez être membre pour postuler.</p>
                                 <div class="d-grid gap-2">

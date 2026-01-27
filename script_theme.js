@@ -41,9 +41,9 @@ const updateIcon = (theme) => {
     const icon = document.getElementById('theme-icon');
 
     if (theme === 'dark') {
-        icon.textContent = '☀️'; // Soleil pour revenir en mode clair
+        icon.innerHTML = '<i class="bi bi-sun-fill"></i>'; // Soleil pour revenir en mode clair
     } else {
-        icon.textContent = '🌙'; // Lune pour passer en mode sombre
+        icon.innerHTML = '<i class="bi bi-moon-fill"></i>'; // Lune pour passer en mode sombre
     }
 }
 

@@ -18,6 +18,11 @@
 session_start();
 require_once 'db.php';
 
+// Gestion du reset de l'inscription si demandé
+if (isset($_GET['reset']) && $_GET['reset'] == '1') {
+    unset($_SESSION['inscription_temp']);
+}
+
 $message = "";
 $step = 1; // 1 = formulaire, 2 = confirmation code
 
@@ -207,7 +212,7 @@ if (isset($_SESSION['inscription_temp']) && $step == 1) {
             </form>
             
             <div class="text-center mt-3">
-                <a href="inscription.php" class="text-muted small" onclick="<?php unset($_SESSION['inscription_temp']); ?>">
+                <a href="inscription.php?reset=1" class="text-muted small">
                     <i class="bi bi-arrow-left"></i> Recommencer l'inscription
                 </a>
             </div>

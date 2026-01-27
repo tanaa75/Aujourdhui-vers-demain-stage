@@ -52,6 +52,7 @@ $messages = $query->fetchAll();
     <title>Messagerie Admin - Aujourd'hui vers Demain</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="mobile-responsive.css">
     <style>
         body { transition: background-color 0.5s; }
         .card-message { transition: transform 0.2s; border: none; border-left: 5px solid #0d6efd; }

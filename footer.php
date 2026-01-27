@@ -83,7 +83,7 @@ STYLES :
                         <li class="mb-3">
                             <div class="d-flex align-items-start">
                                 <div class="footer-contact-icon me-3">
-                                    📍
+                                    <i class="bi bi-geo-alt-fill"></i>
                                 </div>
                                 <div>
                                     <div class="footer-contact-text">116 rue de l'Avenir</div>
@@ -94,7 +94,7 @@ STYLES :
                         <li class="mb-3">
                             <div class="d-flex align-items-center">
                                 <div class="footer-contact-icon me-3">
-                                    ✉️
+                                    <i class="bi bi-envelope-fill"></i>
                                 </div>
                                 <a href="mailto:contact@asso.fr" class="footer-contact-link">contact@asso.fr</a>
                             </div>
@@ -102,7 +102,7 @@ STYLES :
                         <li class="mb-3">
                             <div class="d-flex align-items-center">
                                 <div class="footer-contact-icon me-3">
-                                    📞
+                                    <i class="bi bi-telephone-fill"></i>
                                 </div>
                                 <a href="tel:0123456789" class="footer-contact-link">01 23 45 67 89</a>
                             </div>

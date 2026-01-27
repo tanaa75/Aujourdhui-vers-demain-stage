@@ -42,23 +42,24 @@ if (session_status() === PHP_SESSION_NONE) {
       <ul class="navbar-nav ms-auto align-items-center">
         
         <!-- Liens principaux -->
-        <li class="nav-item"><a class="nav-link" href="index.php">🏠 Accueil</a></li>
-        <li class="nav-item"><a class="nav-link" href="actions.php">📚 Nos Actions</a></li>
-        <li class="nav-item"><a class="nav-link" href="benevolat.php">🤝 Bénévolat</a></li>
-        <li class="nav-item"><a class="nav-link" href="galerie.php">📷 Galerie</a></li>
-        <li class="nav-item"><a class="nav-link" href="contact.php">✉️ Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="index.php"><i class="bi bi-house-fill me-1"></i>Accueil</a></li>
+        <li class="nav-item"><a class="nav-link" href="actions.php"><i class="bi bi-book-fill me-1"></i>Nos Actions</a></li>
+        <li class="nav-item"><a class="nav-link" href="benevolat.php"><i class="bi bi-people-fill me-1"></i>Bénévolat</a></li>
+        <li class="nav-item"><a class="nav-link" href="galerie.php"><i class="bi bi-camera-fill me-1"></i>Galerie</a></li>
+        <li class="nav-item"><a class="nav-link" href="contact.php"><i class="bi bi-envelope-fill me-1"></i>Contact</a></li>
         
         <?php if (isset($_SESSION['user_id'])): ?>
             <!-- ========== MENU ADMINISTRATEUR ========== -->
             <!-- Affiché seulement si un admin est connecté -->
             <li class="nav-item dropdown ms-2">
                 <a class="nav-link dropdown-toggle btn btn-warning text-dark px-3 rounded-pill fw-bold shadow-sm" href="#" role="button" data-bs-toggle="dropdown">
-                    ⚙️ ADMIN
+                    <i class="bi bi-gear-fill me-1"></i>ADMIN
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li><a class="dropdown-item" href="admin_dashboard.php">📅 Gérer événements</a></li>
-                    <li><a class="dropdown-item" href="admin_messages.php">📬 Messagerie</a></li>
-                    <li><a class="dropdown-item" href="admin_security.php">🔐 Sécurité</a></li>
+                    <li><a class="dropdown-item" href="admin_dashboard.php"><i class="bi bi-calendar-event me-2"></i>Gérer événements</a></li>
+                    <li><a class="dropdown-item" href="admin_galerie.php"><i class="bi bi-images me-2"></i>Gérer Galerie</a></li>
+                    <li><a class="dropdown-item" href="admin_messages.php"><i class="bi bi-inbox-fill me-2"></i>Messagerie</a></li>
+                    <li><a class="dropdown-item" href="admin_security.php"><i class="bi bi-shield-lock-fill me-2"></i>Sécurité</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="logout.php">Déconnexion</a></li>
                 </ul>
@@ -69,7 +70,7 @@ if (session_status() === PHP_SESSION_NONE) {
             <!-- Affiché seulement si un membre est connecté -->
             <li class="nav-item dropdown ms-2">
                 <a class="nav-link dropdown-toggle btn bg-white text-dark px-3 rounded-pill fw-bold shadow-sm border-0" href="#" role="button" data-bs-toggle="dropdown">
-                    👤 <?= htmlspecialchars($_SESSION['membre_nom']) ?>
+                    <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($_SESSION['membre_nom']) ?>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
                     <!-- Affiche l'email du membre -->
@@ -90,7 +91,7 @@ if (session_status() === PHP_SESSION_NONE) {
         <!-- Bouton toggle mode jour/nuit -->
         <li class="nav-item ms-2">
             <button class="btn btn-outline-light rounded-circle" onclick="toggleTheme()" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                <span id="theme-icon">🌙</span>
+                <span id="theme-icon"><i class="bi bi-moon-fill"></i></span>
             </button>
         </li>
         

@@ -58,9 +58,12 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 <html lang="fr" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nos Actions - Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="mobile-responsive.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         body { transition: background-color 0.5s; }
@@ -214,7 +217,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                         <div class="d-flex align-items-start mb-4">
                             <div class="flex-shrink-0 me-3">
                                 <div class="actions-icon-wrapper">
-                                    <span class="fs-1">✏️</span>
+                                    <i class="bi bi-pencil-fill fs-1 text-warning"></i>
                                 </div>
                             </div>
                             <div class="flex-grow-1">
@@ -229,12 +232,12 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                         </div>
                         
                         <div class="border-top actions-border pt-4">
-                            <h5 class="fw-bold mb-3 actions-subtitle-small">📋 Informations pratiques</h5>
+                            <h5 class="fw-bold mb-3 actions-subtitle-small"><i class="bi bi-clipboard-check me-2"></i>Informations pratiques</h5>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="info-badge p-3 rounded-3">
                                         <div class="d-flex align-items-center">
-                                            <span class="me-2 fs-5">📅</span>
+                                            <i class="bi bi-calendar-event me-2 fs-5 text-primary"></i>
                                             <div>
                                                 <small class="d-block text-uppercase fw-semibold actions-label">Jours</small>
                                                 <span class="fw-bold actions-value">Lun, Mar, Jeu, Ven</span>
@@ -245,7 +248,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <div class="col-md-6">
                                     <div class="info-badge p-3 rounded-3">
                                         <div class="d-flex align-items-center">
-                                            <span class="me-2 fs-5">🕒</span>
+                                            <i class="bi bi-clock me-2 fs-5 text-success"></i>
                                             <div>
                                                 <small class="d-block text-uppercase fw-semibold actions-label">Horaires</small>
                                                 <span class="fw-bold actions-value">16h30 - 18h00</span>
@@ -256,7 +259,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <div class="col-12">
                                     <div class="info-badge p-3 rounded-3">
                                         <div class="d-flex align-items-center">
-                                            <span class="me-2 fs-5">👩‍🏫</span>
+                                            <i class="bi bi-mortarboard me-2 fs-5 text-info"></i>
                                             <div>
                                                 <small class="d-block text-uppercase fw-semibold actions-label">Niveaux</small>
                                                 <span class="fw-bold actions-value">Du CP au CM2</span>
@@ -272,14 +275,14 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="card border-primary shadow">
                     <div class="card-header bg-primary text-white text-center">
-                        <h5 class="mb-0">📝 Inscrire mon enfant</h5>
+                        <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Inscrire mon enfant</h5>
                     </div>
                     <div class="card-body">
                         
                         <?php if ($est_connecte): ?>
                             
                             <?php if ($inscription_ok): ?>
-                                <div class="alert alert-success">✅ Demande d'inscription envoyée !</div>
+                                <div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>Demande d'inscription envoyée !</div>
                             <?php endif; ?>
                             
                             <form method="POST">
@@ -303,7 +306,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
                         <?php else: ?>
                             <div class="text-center py-4">
-                                <div class="mb-3 display-4">🔒</div>
+                                <div class="mb-3 display-4"><i class="bi bi-lock-fill text-secondary"></i></div>
                                 <h5 class="fw-bold">Espace réservé</h5>
                                 <p class="text-muted mb-4">Connectez-vous pour inscrire votre enfant.</p>
                                 <div class="d-grid gap-2">
@@ -322,13 +325,15 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
         <div class="row mt-5" id="quartier">
             <div class="col-12 text-center mb-5" data-aos="fade-up">
-                <h3 class="fw-bold text-success">🏘️ Vie de Quartier & Citoyenneté</h3>
+                <h3 class="fw-bold text-success"><i class="bi bi-houses-fill me-2"></i>Vie de Quartier & Citoyenneté</h3>
                 <p class="text-muted">Parce qu'un quartier vivant, c'est l'affaire de tous.</p>
             </div>
             
             <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="100">
                 <div class="card p-4 shadow-sm border-0 h-100 hover-card text-center">
-                    <div class="display-4 mb-3 emoji-icon">🎉</div>
+                    <div class="icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 70px; height: 70px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); box-shadow: 0 8px 25px rgba(238, 90, 36, 0.3);">
+                        <i class="bi bi-stars text-white" style="font-size: 1.8rem;"></i>
+                    </div>
                     <h5 class="fw-bold">Animations Locales</h5>
                     <p class="small text-muted mb-0">
                         Fêtes de quartier, repas partagés, sorties culturelles... Nous créons des occasions pour se rencontrer et tisser des liens entre voisins.
@@ -338,7 +343,9 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
             <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="200">
                 <div class="card p-4 shadow-sm border-0 h-100 hover-card text-center">
-                    <div class="display-4 mb-3 emoji-icon">🗣️</div>
+                    <div class="icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 8px 25px rgba(118, 75, 162, 0.3);">
+                        <i class="bi bi-megaphone-fill text-white" style="font-size: 1.8rem;"></i>
+                    </div>
                     <h5 class="fw-bold">Conseil Citoyen</h5>
                     <p class="small text-muted mb-0">
                         Votre voix compte ! Nous faisons le relais entre les habitants et les institutions (Mairie, Est Ensemble) pour améliorer notre cadre de vie.
@@ -348,7 +355,9 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
             <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="300">
                 <div class="card p-4 shadow-sm border-0 h-100 hover-card text-center">
-                    <div class="display-4 mb-3 emoji-icon">🤝</div>
+                    <div class="icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 70px; height: 70px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 8px 25px rgba(56, 239, 125, 0.3);">
+                        <i class="bi bi-people-fill text-white" style="font-size: 1.8rem;"></i>
+                    </div>
                     <h5 class="fw-bold">Médiation Sociale</h5>
                     <p class="small text-muted mb-0">
                         Besoin d'aide pour des démarches ? D'une oreille attentive ? Nous orientons les familles vers les bons interlocuteurs et aidons à résoudre les conflits.

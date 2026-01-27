@@ -129,16 +129,90 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 <html lang="fr" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aujourd'hui vers Demain</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="mobile-responsive.css">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png">
     <style>
         body { transition: background-color 0.5s; }
         .hero-banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-attachment: fixed; color: white; padding: 150px 0; }
         
-        /* CSS POUR LES CARTES QUI BOUGENT */
-        .card-event:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important; }
+        /* CSS POUR LES CARTES D'ÉVÉNEMENTS - ANIMATIONS PREMIUM */
+        .card-event {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .card-event::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(13, 110, 253, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            transition: width 0.6s ease, height 0.6s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        .card-event:hover { 
+            transform: translateY(-15px) rotateX(5deg) scale(1.02); 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25) !important;
+        }
+        
+        .card-event:active {
+            transform: translateY(-5px) scale(0.98);
+            transition: all 0.1s ease;
+        }
+        
+        .card-event:active::before {
+            width: 300%;
+            height: 300%;
+        }
+        
+        .card-event .card-img-top {
+            transition: transform 0.5s ease, filter 0.3s ease;
+        }
+        
+        .card-event:hover .card-img-top {
+            transform: scale(1.1);
+            filter: brightness(1.1);
+        }
+        
+        .card-event .card-body {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-event .badge {
+            transition: all 0.3s ease;
+        }
+        
+        .card-event:hover .badge {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        }
+        
+        /* Animation pulse au clic */
+        @keyframes cardPulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(13, 110, 253, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+        }
+        
+        .card-event.clicked {
+            animation: cardPulse 0.6s ease-out;
+        }
         
         .hover-card {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -516,8 +590,8 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             <h1 class="display-3 fw-bold" data-aos="fade-down">Construire demain, dès aujourd'hui.</h1>
             <p class="lead mb-4" data-aos="fade-in">Au cœur de Noisy-le-Sec, pour l'avenir de nos quartiers.</p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center" data-aos="zoom-in">
-                <a href="#actions" class="btn btn-warning btn-lg rounded-pill shadow fw-bold">📚 Aide aux devoirs</a>
-                <a href="#benevolat" class="btn btn-outline-light btn-lg rounded-pill">🤝 Devenir Bénévole</a>
+                <a href="#actions" class="btn btn-warning btn-lg rounded-pill shadow fw-bold"><i class="bi bi-book-fill me-2"></i>Aide aux devoirs</a>
+                <a href="#benevolat" class="btn btn-outline-light btn-lg rounded-pill"><i class="bi bi-people-fill me-2"></i>Devenir Bénévole</a>
             </div>
         </div>
     </div>
@@ -529,7 +603,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                 <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
                     <div class="stat-card p-3 rounded-3 bg-white bg-opacity-25 backdrop-blur h-100 hover-stat">
                         <div class="stat-icon mb-2">
-                            <span class="fs-1">🤝</span>
+                            <i class="bi bi-people-fill fs-1"></i>
                         </div>
                         <h2 class="display-6 fw-bold mb-1">
                             <span class="counter" data-target="15">0</span>+
@@ -540,7 +614,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                 <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
                     <div class="stat-card p-3 rounded-3 bg-white bg-opacity-25 backdrop-blur h-100 hover-stat">
                         <div class="stat-icon mb-2">
-                            <span class="fs-1">👦</span>
+                            <i class="bi bi-person-hearts fs-1"></i>
                         </div>
                         <h2 class="display-6 fw-bold mb-1">
                             <span class="counter" data-target="50">0</span>+
@@ -551,7 +625,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                 <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
                     <div class="stat-card p-3 rounded-3 bg-white bg-opacity-25 backdrop-blur h-100 hover-stat">
                         <div class="stat-icon mb-2">
-                            <span class="fs-1">🎯</span>
+                            <i class="bi bi-bullseye fs-1"></i>
                         </div>
                         <h2 class="display-6 fw-bold mb-1">
                             <span class="counter" data-target="2020">2000</span>
@@ -603,7 +677,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                         <div class="d-flex align-items-start mb-4">
                             <div class="flex-shrink-0 me-3">
                                 <div class="actions-icon-wrapper">
-                                    <span class="fs-1">✏️</span>
+                                    <i class="bi bi-pencil-fill fs-1 text-warning"></i>
                                 </div>
                             </div>
                             <div class="flex-grow-1">
@@ -618,12 +692,12 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                         </div>
                         
                         <div class="border-top actions-border pt-4">
-                            <h5 class="fw-bold mb-3 actions-subtitle-small">📋 Informations pratiques</h5>
+                            <h5 class="fw-bold mb-3 actions-subtitle-small"><i class="bi bi-clipboard-check me-2"></i>Informations pratiques</h5>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="info-badge p-3 rounded-3">
                                         <div class="d-flex align-items-center">
-                                            <span class="me-2 fs-5">📅</span>
+                                            <i class="bi bi-calendar-event me-2 fs-5 text-primary"></i>
                                             <div>
                                                 <small class="d-block text-uppercase fw-semibold actions-label">Jours</small>
                                                 <span class="fw-bold actions-value">Lun, Mar, Jeu, Ven</span>
@@ -634,7 +708,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <div class="col-md-6">
                                     <div class="info-badge p-3 rounded-3">
                                         <div class="d-flex align-items-center">
-                                            <span class="me-2 fs-5">🕒</span>
+                                            <i class="bi bi-clock me-2 fs-5 text-success"></i>
                                             <div>
                                                 <small class="d-block text-uppercase fw-semibold actions-label">Horaires</small>
                                                 <span class="fw-bold actions-value">16h30 - 18h00</span>
@@ -645,7 +719,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <div class="col-12">
                                     <div class="info-badge p-3 rounded-3">
                                         <div class="d-flex align-items-center">
-                                            <span class="me-2 fs-5">👩‍🏫</span>
+                                            <i class="bi bi-mortarboard me-2 fs-5 text-info"></i>
                                             <div>
                                                 <small class="d-block text-uppercase fw-semibold actions-label">Niveaux</small>
                                                 <span class="fw-bold actions-value">Du CP au CM2</span>
@@ -660,12 +734,12 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             
             <div class="col-lg-6" data-aos="fade-left">
                 <div class="card border-primary shadow">
-                    <div class="card-header bg-primary text-white text-center"><h5 class="mb-0">📝 Inscrire mon enfant</h5></div>
+                    <div class="card-header bg-primary text-white text-center"><h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Inscrire mon enfant</h5></div>
                     <div class="card-body">
                         
                         <?php if ($est_connecte): ?>
                             
-                            <?php if ($inscription_ok): ?><div class="alert alert-success">✅ Inscription envoyée !</div><?php endif; ?>
+                            <?php if ($inscription_ok): ?><div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>Inscription envoyée !</div><?php endif; ?>
                             <form method="POST" action="#actions">
                                 <input type="hidden" name="form_type" value="devoirs">
                                 <div class="row">
@@ -682,7 +756,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 
                         <?php else: ?>
                             <div class="text-center py-4">
-                                <div class="mb-3 display-4">🔒</div>
+                                <div class="mb-3 display-4"><i class="bi bi-lock-fill text-secondary"></i></div>
                                 <h5 class="fw-bold">Réservé aux membres</h5>
                                 <p class="text-muted mb-4">Connectez-vous pour inscrire votre enfant.</p>
                                 <div class="d-grid gap-2">
@@ -699,13 +773,15 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 
         <div class="row mt-5 pt-4">
             <div class="col-12 text-center mb-5" data-aos="fade-up">
-                <h3 class="fw-bold text-success">🏘️ Vie de Quartier & Citoyenneté</h3>
+                <h3 class="fw-bold text-success"><i class="bi bi-houses-fill me-2"></i>Vie de Quartier & Citoyenneté</h3>
                 <p class="text-muted">Parce qu'un quartier vivant, c'est l'affaire de tous.</p>
             </div>
             
             <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="100">
                 <div class="card p-4 shadow-sm border-0 h-100 hover-card text-center">
-                    <div class="display-4 mb-3 emoji-icon">🎉</div>
+                    <div class="icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); box-shadow: 0 10px 30px rgba(238, 90, 36, 0.3);">
+                        <i class="bi bi-stars text-white" style="font-size: 2rem;"></i>
+                    </div>
                     <h5 class="fw-bold">Animations Locales</h5>
                     <p class="small text-muted mb-0">Fêtes de quartier, repas partagés et sorties culturelles pour tous.</p>
                 </div>
@@ -713,7 +789,9 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 
             <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="200">
                 <div class="card p-4 shadow-sm border-0 h-100 hover-card text-center">
-                    <div class="display-4 mb-3 emoji-icon">🗣️</div>
+                    <div class="icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 10px 30px rgba(118, 75, 162, 0.3);">
+                        <i class="bi bi-megaphone-fill text-white" style="font-size: 2rem;"></i>
+                    </div>
                     <h5 class="fw-bold">Conseil Citoyen</h5>
                     <p class="small text-muted mb-0">Votre voix compte ! Participez aux décisions pour améliorer la vie de la cité.</p>
                 </div>
@@ -721,7 +799,9 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 
             <div class="col-md-4 mb-4" data-aos="zoom-in" data-aos-delay="300">
                 <div class="card p-4 shadow-sm border-0 h-100 hover-card text-center">
-                    <div class="display-4 mb-3 emoji-icon">🤝</div>
+                    <div class="icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); box-shadow: 0 10px 30px rgba(56, 239, 125, 0.3);">
+                        <i class="bi bi-people-fill text-white" style="font-size: 2rem;"></i>
+                    </div>
                     <h5 class="fw-bold">Médiation Sociale</h5>
                     <p class="small text-muted mb-0">Une oreille attentive pour orienter les familles et résoudre les conflits.</p>
                 </div>
@@ -744,7 +824,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                     </div>
                     
                     <div class="alert benevolat-alert border-start border-primary border-4 shadow-sm mb-4" role="alert">
-                        <p class="mb-2 fw-semibold">💡 Aucune expertise requise !</p>
+                        <p class="mb-2 fw-semibold"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Aucune expertise requise !</p>
                         <p class="small benevolat-alert-text mb-0">Ce qui compte, c'est votre envie d'être utile et de partager un moment avec la communauté.</p>
                     </div>
                     
@@ -758,7 +838,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">📚</span>
+                                            <i class="bi bi-book-fill fs-4 text-white"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -774,7 +854,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">💻</span>
+                                            <i class="bi bi-laptop fs-4 text-white"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -790,7 +870,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-warning bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">🎪</span>
+                                            <i class="bi bi-balloon-fill fs-4 text-dark"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -806,7 +886,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0 me-3">
                                         <div class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                            <span class="fs-4">🎨</span>
+                                            <i class="bi bi-palette-fill fs-4 text-white"></i>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1">
@@ -831,7 +911,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                     <div class="card shadow-lg border-0 rounded-4 overflow-hidden volunteer-form-card">
                         <div class="card-header bg-gradient text-white text-center py-4 border-0" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
                             <div class="mb-2">
-                                <span class="fs-1">🚀</span>
+                                <i class="bi bi-rocket-takeoff-fill fs-1"></i>
                             </div>
                             <h3 class="mb-1 fw-bold form-header-title">Je me lance !</h3>
                             <p class="small mb-0 fw-semibold form-header-subtitle">Remplissez le formulaire ci-dessous</p>
@@ -858,7 +938,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 
                         <?php else: ?>
                             <div class="text-center py-5">
-                                <div class="mb-3 display-4">🔒</div>
+                                <div class="mb-3 display-4"><i class="bi bi-lock-fill text-secondary"></i></div>
                                 <h5 class="fw-bold">Espace réservé</h5>
                                 <p class="text-muted mb-4">Vous devez être membre pour postuler.</p>
                                 <div class="d-grid gap-2">
@@ -894,10 +974,13 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                 <?php foreach($events as $evt): ?>
                     <div class="col-md-4 mb-3" data-aos="fade-up">
                         <div class="card h-100 shadow border-0 card-event">
+                            <?php if (!empty($evt['image'])): ?>
+                                <img src="uploads/<?= htmlspecialchars($evt['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($evt['titre']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php endif; ?>
                             <div class="card-body">
                                 <span class="badge bg-warning text-dark mb-2"><?= date('d/m/Y', strtotime($evt['date_evenement'])) ?></span>
                                 <h5 class="card-title fw-bold"><?= htmlspecialchars($evt['titre']) ?></h5>
-                                <p class="small text-muted mb-2">📍 <?= htmlspecialchars($evt['lieu']) ?></p>
+                                <p class="small text-muted mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i><?= htmlspecialchars($evt['lieu']) ?></p>
                                 <p class="card-text"><?= nl2br(htmlspecialchars($evt['description'])) ?></p>
                             </div>
                         </div>
@@ -964,6 +1047,19 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                 duration: 800,
                 once: true,
                 offset: 100
+            });
+            
+            // Animation au clic sur les cartes d'événements
+            document.querySelectorAll('.card-event').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Ajoute la classe pour l'animation pulse
+                    this.classList.add('clicked');
+                    
+                    // Retire la classe après l'animation
+                    setTimeout(() => {
+                        this.classList.remove('clicked');
+                    }, 600);
+                });
             });
         });
     </script>

@@ -54,6 +54,8 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
     <title>Contact - Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="mobile-responsive.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         body { transition: background-color 0.5s, color 0.5s; }
@@ -252,11 +254,11 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                         
                         <?php if ($est_connecte): ?>
 
-                            <h4 class="mb-4 fw-bold">💌 Envoyez-nous un message</h4>
+                            <h4 class="mb-4 fw-bold"><i class="bi bi-envelope-heart-fill me-2 text-primary"></i>Envoyez-nous un message</h4>
                             
                             <?php if ($msg_envoye): ?>
                                 <div class="alert alert-success text-center border-0 shadow-sm">
-                                    ✅ Message envoyé ! On vous répond très vite.
+                                    <i class="bi bi-check-circle-fill me-2"></i>Message envoyé ! On vous répond très vite.
                                 </div>
                             <?php endif; ?>
 
@@ -280,7 +282,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
                         <?php else: ?>
                             <div class="text-center py-5">
-                                <div class="mb-3" style="font-size: 4rem;">🔒</div>
+                                <div class="mb-3" style="font-size: 4rem;"><i class="bi bi-lock-fill text-secondary"></i></div>
                                 <h4 class="fw-bold">Espace réservé aux membres</h4>
                                 <p class="text-muted mb-4">Vous devez avoir un compte pour nous envoyer un message.</p>
                                 <div class="d-grid gap-2 col-8 mx-auto">
@@ -300,7 +302,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                     
                     <!-- Coordonnées -->
                     <div class="contact-info-card p-4">
-                        <h5 class="fw-bold mb-4">📍 Nos Coordonnées</h5>
+                        <h5 class="fw-bold mb-4"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Nos Coordonnées</h5>
                         
                         <div class="contact-info-item">
                             <div class="contact-info-icon">
