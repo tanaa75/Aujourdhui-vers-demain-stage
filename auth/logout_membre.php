@@ -20,6 +20,6 @@ unset($_SESSION['membre_email']);
 // Note : si on voulait tout détruire, on utiliserait session_destroy();
 
 // Redirection vers la page d'accueil
-header("Location: index.php");
+header("Location: ../index.php");
 exit();
 ?>

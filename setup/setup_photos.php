@@ -10,7 +10,7 @@
  * À exécuter une seule fois via le navigateur ou phpMyAdmin.
  */
 
-require_once 'db.php';
+require_once '../includes/db.php';
 
 try {
     // Création de la table photos
@@ -36,7 +36,7 @@ try {
     echo "<li><strong>categorie</strong> - Catégorie (Général, Événements, Bénévoles, etc.)</li>";
     echo "<li><strong>date_ajout</strong> - Date d'ajout automatique</li>";
     echo "</ul>";
-    echo "<a href='admin_galerie.php' style='display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px;'>Aller à la Galerie Admin</a>";
+    echo "<a href='../admin/galerie.php' style='display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px;'>Aller à la Galerie Admin</a>";
     echo "</div>";
     
 } catch (PDOException $e) {

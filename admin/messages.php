@@ -24,11 +24,11 @@
 session_start();
 
 // Connexion à la base de données
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // Vérification de sécurité : redirection si non connecté
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../auth/login.php");
     exit();
 }
 
@@ -36,7 +36,7 @@ if (!isset($_SESSION['user_id'])) {
 if (isset($_POST['delete_id'])) {
     $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
     $stmt->execute([$_POST['delete_id']]);
-    header("Location: admin_messages.php");
+    header("Location: messages.php");
     exit();
 }
 
@@ -52,7 +52,7 @@ $messages = $query->fetchAll();
     <title>Messagerie Admin - Aujourd'hui vers Demain</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="mobile-responsive.css">
+    <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     <style>
         body { transition: background-color 0.5s; }
         .card-message { transition: transform 0.2s; border: none; border-left: 5px solid #0d6efd; }
@@ -87,7 +87,7 @@ $messages = $query->fetchAll();
     </style>
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include '../includes/navbar.php'; ?>
 
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -197,10 +197,10 @@ $messages = $query->fetchAll();
 
     <div id="copyToast">✅ Adresse email copiée !</div>
 
-    <?php include 'footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
     <script>
         // Fonction JavaScript pour copier le texte
         function copyToClipboard(text) {

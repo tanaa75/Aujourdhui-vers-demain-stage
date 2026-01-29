@@ -16,7 +16,7 @@
  */
 
 session_start();
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // ========== FILTRES ET TRI ==========
 $categorie_filtre = isset($_GET['cat']) ? $_GET['cat'] : '';
@@ -70,7 +70,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="mobile-responsive.css">
+    <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     
     <style>
         body { transition: background-color 0.5s, color 0.5s; }
@@ -323,7 +323,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
     </style>
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+    <?php include '../includes/navbar.php'; ?>
     
     <!-- Header -->
     <div class="gallery-header">
@@ -379,8 +379,8 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
             <div class="row g-4">
                 <?php foreach ($all_photos as $index => $photo): ?>
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="<?= min($index * 50, 300) ?>">
-                        <div class="photo-card" onclick="openLightbox('uploads/<?= htmlspecialchars($photo['image']) ?>', '<?= htmlspecialchars(addslashes($photo['titre'])) ?>', '<?= date('d/m/Y', strtotime($photo['date_photo'])) ?>')">
-                            <img src="uploads/<?= htmlspecialchars($photo['image']) ?>" alt="<?= htmlspecialchars($photo['titre']) ?>">
+                        <div class="photo-card" onclick="openLightbox('../uploads/<?= htmlspecialchars($photo['image']) ?>', '<?= htmlspecialchars(addslashes($photo['titre'])) ?>', '<?= date('d/m/Y', strtotime($photo['date_photo'])) ?>')">
+                            <img src="../uploads/<?= htmlspecialchars($photo['image']) ?>" alt="<?= htmlspecialchars($photo['titre']) ?>">
                             
                             <!-- Badge catégorie -->
                             <span class="photo-badge badge bg-primary"><?= htmlspecialchars($photo['categorie']) ?></span>
@@ -433,11 +433,11 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
         </div>
     </div>
     
-    <?php include 'footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
     <script>
         // Initialisation AOS
         AOS.init({ duration: 800, once: true });

@@ -1,10 +1,16 @@
+<?php
+// Inclusion de la configuration si pas déjà fait
+if (!defined('BASE_URL')) {
+    require_once __DIR__ . '/config.php';
+}
+?>
 <!--
 ===========================================
 FOOTER - PIED DE PAGE
 ===========================================
 
 Ce fichier contient le pied de page du site.
-Il est inclus dans toutes les pages via include 'footer.php'.
+Il est inclus dans toutes les pages via include.
 
 SECTIONS :
 - Logo et description de l'association
@@ -57,17 +63,17 @@ STYLES :
                     <h5 class="footer-title mb-4">Navigation</h5>
                     <ul class="footer-menu list-unstyled">
                         <li class="mb-3">
-                            <a href="index.php" class="footer-menu-link">
+                            <a href="<?= BASE_URL ?>index.php" class="footer-menu-link">
                                 <i class="bi bi-chevron-right me-2"></i>Accueil
                             </a>
                         </li>
                         <li class="mb-3">
-                            <a href="index.php#actions" class="footer-menu-link">
+                            <a href="<?= BASE_URL ?>pages/actions.php" class="footer-menu-link">
                                 <i class="bi bi-chevron-right me-2"></i>Nos Actions
                             </a>
                         </li>
                         <li class="mb-3">
-                            <a href="index.php#benevolat" class="footer-menu-link">
+                            <a href="<?= BASE_URL ?>index.php#benevolat" class="footer-menu-link">
                                 <i class="bi bi-chevron-right me-2"></i>Devenir Bénévole
                             </a>
                         </li>
@@ -143,9 +149,9 @@ STYLES :
                     </p>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <a href="mentions_legales.php" class="footer-legal-link me-3">Mentions Légales</a>
+                    <a href="<?= BASE_URL ?>pages/mentions_legales.php" class="footer-legal-link me-3">Mentions Légales</a>
                     <span class="footer-separator">•</span>
-                    <a href="confidentialite.php" class="footer-legal-link ms-3">Confidentialité</a>
+                    <a href="<?= BASE_URL ?>pages/confidentialite.php" class="footer-legal-link ms-3">Confidentialité</a>
                 </div>
             </div>
         </div>

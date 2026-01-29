@@ -28,7 +28,7 @@
 session_start(); 
 
 // Connexion à la base de données
-require_once 'db.php';
+require_once 'includes/db.php';
 
 // ========== VARIABLES DE SUIVI ==========
 $inscription_ok = false;   // Inscription devoirs réussie ?
@@ -134,7 +134,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="mobile-responsive.css">
+    <link rel="stylesheet" href="assets/css/mobile-responsive.css">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png">
     <style>
         body { transition: background-color 0.5s; }
@@ -583,7 +583,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <?php include 'navbar.php'; ?>
+    <?php include 'includes/navbar.php'; ?>
 
     <div class="hero-banner text-center">
         <div class="container">
@@ -760,8 +760,8 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <h5 class="fw-bold">Réservé aux membres</h5>
                                 <p class="text-muted mb-4">Connectez-vous pour inscrire votre enfant.</p>
                                 <div class="d-grid gap-2">
-                                    <a href="connexion.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
-                                    <a href="inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
+                                    <a href="auth/connexion.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
+                                    <a href="auth/inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -990,10 +990,10 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
         <?php endif; ?>
     </div>
 
-    <?php include 'footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="assets/js/script_theme.js"></script>
     
     <script>
         // Animation des compteurs

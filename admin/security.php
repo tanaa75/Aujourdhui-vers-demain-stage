@@ -22,12 +22,12 @@ session_start();
 
 // Vérification de sécurité : redirection si non connecté
 if (!isset($_SESSION['user_id'])) { 
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit(); 
 }
 
 // Connexion à la base de données
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // Variable pour les messages (succès ou erreur)
 $message = "";
@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-    <?php include 'navbar.php'; ?>
+    <?php include '../includes/navbar.php'; ?>
 
     <div class="container py-5">
         <div class="row justify-content-center">
@@ -150,7 +150,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold shadow hover-scale">
                                 <i class="bi bi-save2-fill me-2"></i> Enregistrer le changement
                             </button>
-                            <a href="admin_dashboard.php" class="btn btn-outline-secondary rounded-pill fw-bold border-0">
+                            <a href="dashboard.php" class="btn btn-outline-secondary rounded-pill fw-bold border-0">
                                 Annuler et retour
                             </a>
                         </div>
@@ -163,6 +163,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
 </body>
 </html>

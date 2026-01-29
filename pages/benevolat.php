@@ -20,7 +20,7 @@
 session_start();
 
 // Connexion à la base de données
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // Variables de suivi
 $benevole_ok = false;     // Candidature envoyée ?
@@ -60,8 +60,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
                     $new_filename = 'cv_' . preg_replace('/[^a-zA-Z0-9]/', '', $nom) . '_' . time() . '.' . $extension;
                     
                     // Déplacement du fichier dans le dossier uploads
-                    if (move_uploaded_file($_FILES['cv']['tmp_name'], 'uploads/' . $new_filename)) {
-                        $lien_cv = "📄 TÉLÉCHARGER LE CV : http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/uploads/" . $new_filename;
+                    if (move_uploaded_file($_FILES['cv']['tmp_name'], '../uploads/' . $new_filename)) {
+                        $lien_cv = "📄 TÉLÉCHARGER LE CV : http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/../uploads/" . $new_filename;
                     } else { 
                         $error_msg = "Erreur upload."; 
                     }
@@ -97,7 +97,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="mobile-responsive.css">
+    <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         body { transition: background-color 0.5s; }
@@ -247,7 +247,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <?php include 'navbar.php'; ?>
+    <?php include '../includes/navbar.php'; ?>
 
     <div class="position-relative py-5 overflow-hidden benevolat-section">
         <div class="benevolat-bg-overlay"></div>
@@ -410,8 +410,8 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <h5 class="fw-bold">Espace réservé</h5>
                                 <p class="text-muted mb-4">Vous devez être membre pour postuler.</p>
                                 <div class="d-grid gap-2">
-                                    <a href="connexion.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
-                                    <a href="inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
+                                    <a href="../auth/connexion.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
+                                    <a href="../auth/inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -423,9 +423,9 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
         </div>
     </div>
 
-    <?php include 'footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
 </body>
 </html>

@@ -18,7 +18,7 @@
  */
 
 session_start();
-require_once 'db.php';
+require_once '../includes/db.php';
 
 $message = "";
 $step = 1; // Étape actuelle (1 = email, 2 = code + nouveau mdp)
@@ -202,6 +202,6 @@ if (isset($_SESSION['reset_code']) && $step == 1) {
 
     </div>
 
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
 </body>
 </html>

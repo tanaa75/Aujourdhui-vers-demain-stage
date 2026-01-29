@@ -22,11 +22,11 @@ session_start();
 
 // Vérification de sécurité
 if (!isset($_SESSION['user_id'])) { 
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit(); 
 }
 
-require_once 'db.php';
+require_once '../includes/db.php';
 
 $message = "";
 $message_type = "";
@@ -77,12 +77,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Renommage unique du fichier
             $new_name = "gallery_" . time() . "_" . rand(1000, 9999) . "." . $ext;
             
-            if (move_uploaded_file($_FILES['image']['tmp_name'], "uploads/" . $new_name)) {
+            if (move_uploaded_file($_FILES['image']['tmp_name'], "../uploads/" . $new_name)) {
                 // Insertion en base
                 $stmt = $pdo->prepare("INSERT INTO photos (titre, description, image, categorie) VALUES (?, ?, ?, ?)");
                 $stmt->execute([$titre, $description, $new_name, $categorie]);
                 
-                header("Location: admin_galerie.php?msg=added");
+                header("Location: galerie.php?msg=added");
                 exit();
             } else {
                 $message = "Erreur lors de l'upload de l'image.";
@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="mobile-responsive.css">
+    <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     <style>
         body { transition: background-color 0.5s, color 0.5s; }
         
@@ -172,14 +172,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body class="bg-body-tertiary">
-    <?php include 'navbar.php'; ?>
+    <?php include '../includes/navbar.php'; ?>
     
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 
                 <!-- Bouton retour -->
-                <a href="admin_galerie.php" class="btn btn-outline-secondary rounded-pill mb-4">
+                <a href="galerie.php" class="btn btn-outline-secondary rounded-pill mb-4">
                     <i class="bi bi-arrow-left me-2"></i>Retour à la galerie
                 </a>
                 
@@ -276,10 +276,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
     
-    <?php include 'footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
     <script>
         const uploadZone = document.getElementById('uploadZone');
         const imageInput = document.getElementById('imageInput');

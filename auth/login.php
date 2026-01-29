@@ -16,10 +16,10 @@
 session_start();
 
 // Connexion à la base de données
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // Inclusion des fonctions de sécurité
-require_once 'security.php';
+require_once '../includes/security.php';
 
 // Variable pour les erreurs
 $error_msg = "";
@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['identifiant'] = $user['identifiant'];
             
             // Redirection vers le tableau de bord admin
-            header("Location: admin_dashboard.php");
+            header("Location: ../admin/dashboard.php");
             exit();
             
         } else {
@@ -143,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <!-- Lien retour -->
         <div class="text-center mt-4">
-            <a href="index.php" class="btn btn-outline-secondary rounded-pill py-2 px-4 fw-bold border-2">
+            <a href="../index.php" class="btn btn-outline-secondary rounded-pill py-2 px-4 fw-bold border-2">
                 <i class="bi bi-arrow-left"></i> Retour au site public
             </a>
         </div>

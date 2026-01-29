@@ -16,7 +16,7 @@
  */
 
 session_start();
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // Gestion du reset de l'inscription si demandé
 if (isset($_GET['reset']) && $_GET['reset'] == '1') {
@@ -224,12 +224,12 @@ if (isset($_SESSION['inscription_temp']) && $step == 1) {
                 Déjà membre ? Se connecter
             </a>
 
-            <a href="index.php" class="text-decoration-none text-secondary mt-2 py-2 fs-6">
+            <a href="../index.php" class="text-decoration-none text-secondary mt-2 py-2 fs-6">
                 <i class="bi bi-arrow-left"></i> Retour à l'accueil
             </a>
         </div>
     </div>
 
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
 </body>
 </html>

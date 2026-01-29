@@ -5,7 +5,7 @@
  * ===========================================
  * 
  * Ce fichier contient le menu de navigation du site.
- * Il est inclus dans toutes les pages via include 'navbar.php'.
+ * Il est inclus dans toutes les pages via include.
  * 
  * Fonctionnalités :
  * - Logo et nom de l'association
@@ -20,6 +20,9 @@
 if (session_status() === PHP_SESSION_NONE) { 
     session_start(); 
 }
+
+// Inclusion du fichier de configuration pour les chemins
+require_once __DIR__ . '/config.php';
 ?>
 
 <!-- Navigation principale - sticky-top = reste en haut lors du scroll -->
@@ -27,7 +30,7 @@ if (session_status() === PHP_SESSION_NONE) {
   <div class="container">
     
     <!-- Logo et nom de l'association -->
-    <a class="navbar-brand d-flex align-items-center fw-bold" href="index.php">
+    <a class="navbar-brand d-flex align-items-center fw-bold" href="<?= BASE_URL ?>index.php">
         <img src="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" alt="Logo" width="35" height="35" class="d-inline-block align-text-top me-2 animate-logo">
         Aujourd'hui vers Demain
     </a>
@@ -42,11 +45,11 @@ if (session_status() === PHP_SESSION_NONE) {
       <ul class="navbar-nav ms-auto align-items-center">
         
         <!-- Liens principaux -->
-        <li class="nav-item"><a class="nav-link" href="index.php"><i class="bi bi-house-fill me-1"></i>Accueil</a></li>
-        <li class="nav-item"><a class="nav-link" href="actions.php"><i class="bi bi-book-fill me-1"></i>Nos Actions</a></li>
-        <li class="nav-item"><a class="nav-link" href="benevolat.php"><i class="bi bi-people-fill me-1"></i>Bénévolat</a></li>
-        <li class="nav-item"><a class="nav-link" href="galerie.php"><i class="bi bi-camera-fill me-1"></i>Galerie</a></li>
-        <li class="nav-item"><a class="nav-link" href="contact.php"><i class="bi bi-envelope-fill me-1"></i>Contact</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>index.php"><i class="bi bi-house-fill me-1"></i>Accueil</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>pages/actions.php"><i class="bi bi-book-fill me-1"></i>Nos Actions</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>pages/benevolat.php"><i class="bi bi-people-fill me-1"></i>Bénévolat</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>pages/galerie.php"><i class="bi bi-camera-fill me-1"></i>Galerie</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>pages/contact.php"><i class="bi bi-envelope-fill me-1"></i>Contact</a></li>
         
         <?php if (isset($_SESSION['user_id'])): ?>
             <!-- ========== MENU ADMINISTRATEUR ========== -->
@@ -56,12 +59,12 @@ if (session_status() === PHP_SESSION_NONE) {
                     <i class="bi bi-gear-fill me-1"></i>ADMIN
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow">
-                    <li><a class="dropdown-item" href="admin_dashboard.php"><i class="bi bi-calendar-event me-2"></i>Gérer événements</a></li>
-                    <li><a class="dropdown-item" href="admin_galerie.php"><i class="bi bi-images me-2"></i>Gérer Galerie</a></li>
-                    <li><a class="dropdown-item" href="admin_messages.php"><i class="bi bi-inbox-fill me-2"></i>Messagerie</a></li>
-                    <li><a class="dropdown-item" href="admin_security.php"><i class="bi bi-shield-lock-fill me-2"></i>Sécurité</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/dashboard.php"><i class="bi bi-calendar-event me-2"></i>Gérer événements</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/galerie.php"><i class="bi bi-images me-2"></i>Gérer Galerie</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/messages.php"><i class="bi bi-inbox-fill me-2"></i>Messagerie</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/security.php"><i class="bi bi-shield-lock-fill me-2"></i>Sécurité</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="logout.php">Déconnexion</a></li>
+                    <li><a class="dropdown-item text-danger" href="<?= BASE_URL ?>auth/logout.php">Déconnexion</a></li>
                 </ul>
             </li>
 
@@ -76,7 +79,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <!-- Affiche l'email du membre -->
                     <li><span class="dropdown-item-text text-muted small"><i class="bi bi-envelope"></i> <?= htmlspecialchars($_SESSION['membre_email']) ?></span></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger fw-bold" href="logout_membre.php"><i class="bi bi-box-arrow-right"></i> Se déconnecter</a></li>
+                    <li><a class="dropdown-item text-danger fw-bold" href="<?= BASE_URL ?>auth/logout_membre.php"><i class="bi bi-box-arrow-right"></i> Se déconnecter</a></li>
                 </ul>
             </li>
 
@@ -84,7 +87,7 @@ if (session_status() === PHP_SESSION_NONE) {
             <!-- ========== BOUTON CONNEXION ========== -->
             <!-- Affiché si personne n'est connecté -->
             <li class="nav-item ms-2">
-                <a class="btn btn-outline-light rounded-pill px-4 fw-bold" href="connexion.php">Se connecter</a>
+                <a class="btn btn-outline-light rounded-pill px-4 fw-bold" href="<?= BASE_URL ?>auth/connexion.php">Se connecter</a>
             </li>
         <?php endif; ?>
 

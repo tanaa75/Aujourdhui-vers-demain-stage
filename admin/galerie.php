@@ -18,11 +18,11 @@ session_start();
 
 // Vérification de sécurité : redirection si non connecté
 if (!isset($_SESSION['user_id'])) { 
-    header("Location: login.php"); 
+    header("Location: ../auth/login.php"); 
     exit(); 
 }
 
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // ========== SUPPRESSION D'UNE PHOTO ==========
 if (isset($_GET['delete'])) {
@@ -35,7 +35,7 @@ if (isset($_GET['delete'])) {
     
     if ($photo) {
         // Supprimer le fichier image
-        $filepath = "uploads/" . $photo['image'];
+        $filepath = "../uploads/" . $photo['image'];
         if (file_exists($filepath)) {
             unlink($filepath);
         }
@@ -45,7 +45,7 @@ if (isset($_GET['delete'])) {
         $stmt->execute([$id]);
     }
     
-    header("Location: admin_galerie.php?msg=deleted");
+    header("Location: galerie.php?msg=deleted");
     exit();
 }
 
@@ -73,7 +73,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="mobile-responsive.css">
+    <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     <style>
         body { transition: background-color 0.5s, color 0.5s; }
         
@@ -161,7 +161,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
     </style>
 </head>
 <body class="bg-body-tertiary">
-    <?php include 'navbar.php'; ?>
+    <?php include '../includes/navbar.php'; ?>
     
     <!-- Header -->
     <div class="page-header">
@@ -173,7 +173,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
                     </h1>
                     <p class="mb-0 opacity-75">Gérez les photos de votre association</p>
                 </div>
-                <a href="admin_add_photo.php" class="btn btn-light btn-lg rounded-pill shadow">
+                <a href="add_photo.php" class="btn btn-light btn-lg rounded-pill shadow">
                     <i class="bi bi-plus-circle me-2"></i>Ajouter une photo
                 </a>
             </div>
@@ -231,11 +231,11 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
             <div class="card-body">
                 <h6 class="fw-bold mb-3"><i class="bi bi-funnel me-2"></i>Filtrer par catégorie</h6>
                 <nav class="filter-pills">
-                    <a href="admin_galerie.php" class="btn <?= $categorie_filtre == '' ? 'btn-primary' : 'btn-outline-primary' ?>">
+                    <a href="galerie.php" class="btn <?= $categorie_filtre == '' ? 'btn-primary' : 'btn-outline-primary' ?>">
                         Toutes
                     </a>
                     <?php foreach ($categories as $cat): ?>
-                        <a href="admin_galerie.php?cat=<?= urlencode($cat) ?>" 
+                        <a href="galerie.php?cat=<?= urlencode($cat) ?>" 
                            class="btn <?= $categorie_filtre == $cat ? 'btn-primary' : 'btn-outline-primary' ?>">
                             <?= htmlspecialchars($cat) ?>
                         </a>
@@ -251,7 +251,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
                 <?php foreach ($photos as $photo): ?>
                     <div class="col-lg-3 col-md-4 col-6">
                         <div class="photo-admin-card shadow bg-body">
-                            <img src="uploads/<?= htmlspecialchars($photo['image']) ?>" 
+                            <img src="../uploads/<?= htmlspecialchars($photo['image']) ?>" 
                                  alt="<?= htmlspecialchars($photo['titre']) ?>">
                             
                             <!-- Badge catégorie -->
@@ -259,7 +259,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
                             
                             <!-- Boutons d'action -->
                             <div class="photo-actions">
-                                <a href="admin_galerie.php?delete=<?= $photo['id'] ?>" 
+                                <a href="galerie.php?delete=<?= $photo['id'] ?>" 
                                    class="btn btn-danger btn-sm rounded-circle"
                                    onclick="return confirm('Supprimer cette photo ?')"
                                    title="Supprimer">
@@ -284,7 +284,7 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
                 <i class="bi bi-camera display-1 text-muted opacity-50"></i>
                 <h4 class="mt-3 text-muted">Aucune photo dans la galerie</h4>
                 <p class="text-muted">Commencez par ajouter votre première photo !</p>
-                <a href="admin_add_photo.php" class="btn btn-primary rounded-pill">
+                <a href="add_photo.php" class="btn btn-primary rounded-pill">
                     <i class="bi bi-plus-circle me-2"></i>Ajouter une photo
                 </a>
             </div>
@@ -292,9 +292,9 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
         
     </div>
     
-    <?php include 'footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
 </body>
 </html>

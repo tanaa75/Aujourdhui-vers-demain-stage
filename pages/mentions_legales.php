@@ -207,7 +207,7 @@ session_start();
 </head>
 <body class="d-flex flex-column min-vh-100 legal-page">
     
-    <?php include 'navbar.php'; ?>
+    <?php include '../includes/navbar.php'; ?>
 
     <!-- Header -->
     <div class="legal-header">
@@ -319,11 +319,11 @@ session_start();
         </div>
     </div>
 
-    <?php include 'footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script_theme.js"></script>
+    <script src="../assets/js/script_theme.js"></script>
     <script>
         AOS.init({
             duration: 800,

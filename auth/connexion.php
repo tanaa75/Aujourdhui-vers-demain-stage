@@ -16,10 +16,10 @@
 session_start();
 
 // Connexion à la base de données
-require_once 'db.php';
+require_once '../includes/db.php';
 
 // Inclusion des fonctions de sécurité
-require_once 'security.php';
+require_once '../includes/security.php';
 
 // Variable pour stocker les erreurs
 $error = "";
@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['membre_email'] = $membre['email'];
             
             // Redirection vers la page d'accueil
-            header("Location: index.php");
+            header("Location: ../index.php");
             exit();
             
         } else {
@@ -155,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </a>
 
             <!-- Retour à l'accueil -->
-            <a href="index.php" class="text-decoration-none text-secondary mt-2 py-2 fs-6">
+            <a href="../index.php" class="text-decoration-none text-secondary mt-2 py-2 fs-6">
                 <i class="bi bi-arrow-left"></i> Retour à l'accueil
             </a>
 
