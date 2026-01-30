@@ -942,8 +942,8 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <h5 class="fw-bold">Espace réservé</h5>
                                 <p class="text-muted mb-4">Vous devez être membre pour postuler.</p>
                                 <div class="d-grid gap-2">
-                                    <a href="connexion.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
-                                    <a href="inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
+                                    <a href="auth/login.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
+                                    <a href="auth/inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
                                 </div>
                             </div>
                         <?php endif; ?>
