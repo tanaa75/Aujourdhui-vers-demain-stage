@@ -26,18 +26,24 @@ session_start();
 // Connexion à la base de données
 require_once '../includes/db.php';
 
+// Inclusion des fonctions de sécurité pour CSRF
+require_once '../includes/security.php';
+
 // Vérification de sécurité : redirection si non connecté
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../auth/login.php");
     exit();
 }
 
-// ========== SUPPRESSION D'UN MESSAGE ==========
-if (isset($_POST['delete_id'])) {
-    $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
-    $stmt->execute([$_POST['delete_id']]);
-    header("Location: messages.php");
-    exit();
+// ========== SUPPRESSION D'UN MESSAGE (avec CSRF) ==========
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['delete_id'])) {
+    if (isset($_POST['csrf_token']) && verifier_token_csrf($_POST['csrf_token'])) {
+        $delete_id = intval($_POST['delete_id']);
+        $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
+        $stmt->execute([$delete_id]);
+        header("Location: messages.php");
+        exit();
+    }
 }
 
 // Récupération de tous les messages (du plus récent au plus ancien)
@@ -49,42 +55,14 @@ $messages = $query->fetchAll();
 <html lang="fr" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
-    <title>Messagerie Admin - Aujourd'hui vers Demain</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Messagerie | Admin - Aujourd'hui vers Demain</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
-    <style>
-        body { transition: background-color 0.5s; }
-        .card-message { transition: transform 0.2s; border: none; border-left: 5px solid #0d6efd; }
-        .card-message:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .type-benevole { border-left-color: #dc3545; }
-        .type-devoirs { border-left-color: #ffc107; }
-        .icon-box { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-        
-        /* Petit message toast pour la copie */
-        #copyToast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 2px; padding: 16px; position: fixed; z-index: 1; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 17px; }
-        #copyToast.show { visibility: visible; -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
-        
-        /* Mode clair */
-        [data-bs-theme="light"] .message-bg {
-            background: #f8f9fa;
-        }
-        [data-bs-theme="light"] .message-content {
-            background: #f1f3f5;
-            color: #555;
-        }
-        
-        /* Mode sombre */
-        [data-bs-theme="dark"] .message-bg {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        [data-bs-theme="dark"] .message-content {
-            background: rgba(255, 255, 255, 0.08);
-            color: #dee2e6;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
     <?php include '../includes/navbar.php'; ?>
@@ -154,9 +132,12 @@ $messages = $query->fetchAll();
                                         </div>
                                     </div>
                                     
-                                    <form method="POST" onsubmit="return confirm('Supprimer ?');">
+                                    <form method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?');">
+                                        <?= champ_csrf() ?>
                                         <input type="hidden" name="delete_id" value="<?= $msg['id'] ?>">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle"><i class="bi bi-trash"></i></button>
+                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle" aria-label="Supprimer">
+                                            <i class="bi bi-trash" aria-hidden="true"></i>
+                                        </button>
                                     </form>
                                 </div>
 

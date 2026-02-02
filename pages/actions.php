@@ -22,8 +22,12 @@ session_start();
 // Connexion à la base de données
 require_once '../includes/db.php';
 
+// Inclusion des fonctions de sécurité pour CSRF
+require_once '../includes/security.php';
+
 // Variable pour suivre si l'inscription a réussi
 $inscription_ok = false;
+$error_msg = "";
 
 // Vérification : est-ce qu'un membre OU un admin est connecté ?
 $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
@@ -31,9 +35,10 @@ $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 // ========== TRAITEMENT DU FORMULAIRE ==========
 // On traite seulement si connecté et si c'est le bon formulaire
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_connecte) {
-    
-    // Vérification du type de formulaire
-    if ($_POST['form_type'] == 'devoirs') {
+    // Vérification CSRF
+    if (!isset($_POST['csrf_token']) || !verifier_token_csrf($_POST['csrf_token'])) {
+        $error_msg = "Erreur de sécurité. Veuillez réessayer.";
+    } elseif ($_POST['form_type'] == 'devoirs') {
         // Récupération des données du formulaire
         $nom = $_POST['nom'];
         $prenom = $_POST['prenom'];
@@ -59,146 +64,15 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nos Actions - Aujourd'hui vers Demain</title>
+    <meta name="description" content="Découvrez nos actions : aide aux devoirs, vie de quartier et citoyenneté avec l'association Aujourd'hui vers Demain.">
+    <meta name="robots" content="index, follow">
+    <title>Nos Actions | Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <style>
-        body { transition: background-color 0.5s; }
-        
-        /* EFFET SURVOL DES CARTES */
-        .hover-card {
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-        }
-        .hover-card:hover {
-            transform: translateY(-15px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
-        }
-        .hover-card .emoji-icon {
-            display: inline-block;
-            transition: transform 0.3s;
-        }
-        .hover-card:hover .emoji-icon {
-            transform: scale(1.3) rotate(10deg);
-        }
-        
-        /* SECTION ACTIONS - ADAPTATION THÈME */
-        .actions-section {
-            background: var(--bs-body-bg);
-        }
-        
-        .actions-icon-wrapper {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            transition: transform 0.3s ease;
-        }
-        
-        .actions-info-card:hover .actions-icon-wrapper {
-            transform: rotate(10deg) scale(1.1);
-        }
-        
-        .info-badge {
-            transition: all 0.3s ease;
-        }
-        
-        .info-badge:hover {
-            transform: translateY(-3px);
-        }
-        
-        /* Mode clair */
-        [data-bs-theme="light"] .actions-subtitle {
-            color: #6c757d;
-        }
-        
-        [data-bs-theme="light"] .actions-info-card {
-            background: #ffffff;
-            border: 1px solid #e9ecef;
-        }
-        
-        [data-bs-theme="light"] .actions-icon-wrapper {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-        }
-        
-        [data-bs-theme="light"] .actions-title {
-            color: #212529;
-        }
-        
-        [data-bs-theme="light"] .actions-text {
-            color: #6c757d;
-        }
-        
-        [data-bs-theme="light"] .actions-border {
-            border-color: #e9ecef !important;
-        }
-        
-        [data-bs-theme="light"] .actions-subtitle-small {
-            color: #495057;
-        }
-        
-        [data-bs-theme="light"] .info-badge {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-        }
-        
-        [data-bs-theme="light"] .actions-label {
-            color: #6c757d;
-        }
-        
-        [data-bs-theme="light"] .actions-value {
-            color: #212529;
-        }
-        
-        /* Mode sombre */
-        [data-bs-theme="dark"] .actions-subtitle {
-            color: #adb5bd;
-        }
-        
-        [data-bs-theme="dark"] .actions-info-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        [data-bs-theme="dark"] .actions-icon-wrapper {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-        }
-        
-        [data-bs-theme="dark"] .actions-title {
-            color: #f8f9fa;
-        }
-        
-        [data-bs-theme="dark"] .actions-text {
-            color: #adb5bd;
-        }
-        
-        [data-bs-theme="dark"] .actions-border {
-            border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        [data-bs-theme="dark"] .actions-subtitle-small {
-            color: #dee2e6;
-        }
-        
-        [data-bs-theme="dark"] .info-badge {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        
-        [data-bs-theme="dark"] .actions-label {
-            color: #868e96;
-        }
-        
-        [data-bs-theme="dark"] .actions-value {
-            color: #f8f9fa;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/actions.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php include '../includes/navbar.php'; ?>
@@ -286,6 +160,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                             <?php endif; ?>
                             
                             <form method="POST">
+                                <?= champ_csrf() ?>
                                 <input type="hidden" name="form_type" value="devoirs">
                                 <div class="row">
                                     <div class="col-6 mb-3"><label>Nom de l'enfant</label><input type="text" name="nom" class="form-control" required></div>

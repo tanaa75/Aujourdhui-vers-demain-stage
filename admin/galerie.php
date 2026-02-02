@@ -24,29 +24,37 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once '../includes/db.php';
 
-// ========== SUPPRESSION D'UNE PHOTO ==========
-if (isset($_GET['delete'])) {
-    $id = intval($_GET['delete']);
-    
-    // Récupérer le nom du fichier avant suppression
-    $stmt = $pdo->prepare("SELECT image FROM photos WHERE id = ?");
-    $stmt->execute([$id]);
-    $photo = $stmt->fetch();
-    
-    if ($photo) {
-        // Supprimer le fichier image
-        $filepath = "../uploads/" . $photo['image'];
-        if (file_exists($filepath)) {
-            unlink($filepath);
+// Inclusion des fonctions de sécurité pour CSRF
+require_once '../includes/security.php';
+
+// ========== SUPPRESSION D'UNE PHOTO (MÉTHODE POST SÉCURISÉE) ==========
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_photo'])) {
+    // Vérification CSRF
+    if (!isset($_POST['csrf_token']) || !verifier_token_csrf($_POST['csrf_token'])) {
+        $error_msg = "Erreur de sécurité. Veuillez réessayer.";
+    } else {
+        $id = intval($_POST['delete_photo']);
+        
+        // Récupérer le nom du fichier avant suppression
+        $stmt = $pdo->prepare("SELECT image FROM photos WHERE id = ?");
+        $stmt->execute([$id]);
+        $photo = $stmt->fetch();
+        
+        if ($photo) {
+            // Supprimer le fichier image
+            $filepath = "../uploads/" . $photo['image'];
+            if (file_exists($filepath)) {
+                unlink($filepath);
+            }
+            
+            // Supprimer l'enregistrement en base
+            $stmt = $pdo->prepare("DELETE FROM photos WHERE id = ?");
+            $stmt->execute([$id]);
         }
         
-        // Supprimer l'enregistrement en base
-        $stmt = $pdo->prepare("DELETE FROM photos WHERE id = ?");
-        $stmt->execute([$id]);
+        header("Location: galerie.php?msg=deleted");
+        exit();
     }
-    
-    header("Location: galerie.php?msg=deleted");
-    exit();
 }
 
 // ========== FILTRE PAR CATÉGORIE ==========
@@ -69,96 +77,13 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion Galerie - Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Gestion Galerie | Admin - Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
-    <style>
-        body { transition: background-color 0.5s, color 0.5s; }
-        
-        /* Carte photo admin */
-        .photo-admin-card {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .photo-admin-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
-        }
-        
-        .photo-admin-card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-        
-        .photo-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 5px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .photo-admin-card:hover .photo-actions {
-            opacity: 1;
-        }
-        
-        .photo-badge {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-        
-        /* Header page */
-        .page-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 30px 0;
-            margin-bottom: 30px;
-            color: white;
-        }
-        
-        /* Filtre catégories */
-        .filter-pills .nav-link {
-            border-radius: 20px;
-            padding: 8px 20px;
-            margin: 0 5px 10px 0;
-            transition: all 0.3s ease;
-        }
-        
-        .filter-pills .nav-link:hover {
-            transform: translateY(-2px);
-        }
-        
-        /* Stats */
-        .stat-card {
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        
-        .stat-card:hover {
-            transform: scale(1.05);
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .photo-actions {
-                opacity: 1;
-            }
-            
-            .photo-admin-card img {
-                height: 150px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body class="bg-body-tertiary">
     <?php include '../includes/navbar.php'; ?>
@@ -259,12 +184,13 @@ $categories = $pdo->query("SELECT DISTINCT categorie FROM photos ORDER BY catego
                             
                             <!-- Boutons d'action -->
                             <div class="photo-actions">
-                                <a href="galerie.php?delete=<?= $photo['id'] ?>" 
-                                   class="btn btn-danger btn-sm rounded-circle"
-                                   onclick="return confirm('Supprimer cette photo ?')"
-                                   title="Supprimer">
-                                    <i class="bi bi-trash"></i>
-                                </a>
+                                <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer cette photo ?')">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                    <input type="hidden" name="delete_photo" value="<?= $photo['id'] ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-circle" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                             
                             <!-- Info photo -->

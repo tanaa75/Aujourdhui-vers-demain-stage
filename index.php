@@ -30,6 +30,36 @@ session_start();
 // Connexion à la base de données
 require_once 'includes/db.php';
 
+// ========== PROTECTION CSRF ==========
+// Génération d'un token unique pour protéger les formulaires
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
+/**
+ * Fonction de nettoyage des entrées utilisateur
+ * @param string $data - Donnée à nettoyer
+ * @return string - Donnée nettoyée
+ */
+function sanitize_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+    return $data;
+}
+
+/**
+ * Validation du token CSRF
+ * @return bool - True si valide, false sinon
+ */
+function verify_csrf_token() {
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token'])) {
+        return false;
+    }
+    return hash_equals($_SESSION['csrf_token'], $_POST['csrf_token']);
+}
+
 // ========== VARIABLES DE SUIVI ==========
 $inscription_ok = false;   // Inscription devoirs réussie ?
 $benevole_ok = false;      // Candidature bénévole réussie ?
@@ -39,71 +69,92 @@ $error_msg = "";           // Message d'erreur éventuel
 $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 
 // ========== TRAITEMENT DES FORMULAIRES ==========
-// On ne traite les formulaires QUE si l'utilisateur est connecté
+// On ne traite les formulaires QUE si l'utilisateur est connecté ET le token CSRF est valide
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_connecte) {
     
-    // ------------------------------------------
-    // CAS 1 : INSCRIPTION AIDE AUX DEVOIRS
-    // ------------------------------------------
-    if ($_POST['form_type'] == 'devoirs') {
-        $nom = $_POST['nom'];
-        $prenom = $_POST['prenom'];
-        $classe = $_POST['classe'];
-        $tel = $_POST['tel'];
-        $email = $_POST['email'];
-        
-        // Construction du message formaté
-        $msg = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel\nEmail parent : $email";
-        
-        // Insertion en base de données
-        $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
-        $stmt->execute(["Parent de $prenom", $email, $msg]);
-        $inscription_ok = true;
-    }
-
-    // ------------------------------------------
-    // CAS 2 : CANDIDATURE BÉNÉVOLE
-    // ------------------------------------------
-    if ($_POST['form_type'] == 'benevolat') {
-        $nom = $_POST['nom'];
-        $email = $_POST['email'];
-        $tel = $_POST['tel'];
-        $dispo = $_POST['dispo'];
-        $skills = $_POST['skills'];
-        
-        $lien_cv = "Aucun CV fourni";
-        
-        // Gestion de l'upload du CV
-        if (isset($_FILES['cv']) && $_FILES['cv']['error'] == 0) {
-            // Vérification taille (max 5 Mo)
-            if ($_FILES['cv']['size'] <= 5000000) {
-                $ext = strtolower(pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION));
+    // Vérification du token CSRF
+    if (!verify_csrf_token()) {
+        $error_msg = "Erreur de sécurité. Veuillez réessayer.";
+    } else {
+        // ------------------------------------------
+        // CAS 1 : INSCRIPTION AIDE AUX DEVOIRS
+        // ------------------------------------------
+        if ($_POST['form_type'] == 'devoirs') {
+            // Nettoyage et validation des entrées
+            $nom = sanitize_input($_POST['nom']);
+            $prenom = sanitize_input($_POST['prenom']);
+            $classe = sanitize_input($_POST['classe']);
+            $tel = sanitize_input($_POST['tel']);
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            
+            // Validation de l'email
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error_msg = "Adresse email invalide.";
+            } elseif (!preg_match('/^[0-9\s\+\-\.]+$/', $tel)) {
+                $error_msg = "Numéro de téléphone invalide.";
+            } else {
+                // Construction du message formaté
+                $msg = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel\nEmail parent : $email";
                 
-                // Vérification extension
-                if (in_array($ext, ['pdf', 'doc', 'docx', 'jpg', 'png'])) {
-                    // Renommage sécurisé
-                    $newname = 'cv_' . preg_replace('/[^a-zA-Z0-9]/', '', $nom) . '_' . time() . '.' . $ext;
-                    
-                    // Déplacement dans le dossier uploads
-                    if(move_uploaded_file($_FILES['cv']['tmp_name'], 'uploads/' . $newname)) {
-                        $lien_cv = "📄 TÉLÉCHARGER LE CV : http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/uploads/" . $newname;
-                    }
-                } else { 
-                    $error_msg = "Format invalide."; 
-                }
-            } else { 
-                $error_msg = "Fichier trop lourd."; 
+                // Insertion en base de données
+                $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
+                $stmt->execute(["Parent de $prenom", $email, $msg]);
+                $inscription_ok = true;
             }
         }
 
-        // Si pas d'erreur, on enregistre la candidature
-        if (empty($error_msg)) {
-            $msg = "❤️ NOUVEAU BÉNÉVOLE !\n\nNom : $nom\nEmail : $email\nTéléphone : $tel\n\nDispos : $dispo\nAime faire : $skills\n\n$lien_cv";
-            $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
-            $stmt->execute([$nom, $email, $msg]);
-            $benevole_ok = true;
+        // ------------------------------------------
+        // CAS 2 : CANDIDATURE BÉNÉVOLE
+        // ------------------------------------------
+        if ($_POST['form_type'] == 'benevolat') {
+            // Nettoyage et validation des entrées
+            $nom = sanitize_input($_POST['nom']);
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            $tel = sanitize_input($_POST['tel']);
+            $dispo = sanitize_input($_POST['dispo']);
+            $skills = sanitize_input($_POST['skills']);
+            
+            // Validation
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $error_msg = "Adresse email invalide.";
+            } elseif (!preg_match('/^[0-9\s\+\-\.]+$/', $tel)) {
+                $error_msg = "Numéro de téléphone invalide.";
+            } else {
+                $lien_cv = "Aucun CV fourni";
+                
+                // Gestion de l'upload du CV
+                if (isset($_FILES['cv']) && $_FILES['cv']['error'] == 0) {
+                    // Vérification taille (max 5 Mo)
+                    if ($_FILES['cv']['size'] <= 5000000) {
+                        $ext = strtolower(pathinfo($_FILES['cv']['name'], PATHINFO_EXTENSION));
+                        
+                        // Vérification extension
+                        if (in_array($ext, ['pdf', 'doc', 'docx', 'jpg', 'png'])) {
+                            // Renommage sécurisé
+                            $newname = 'cv_' . preg_replace('/[^a-zA-Z0-9]/', '', $nom) . '_' . time() . '.' . $ext;
+                            
+                            // Déplacement dans le dossier uploads
+                            if(move_uploaded_file($_FILES['cv']['tmp_name'], 'uploads/' . $newname)) {
+                                $lien_cv = "📄 TÉLÉCHARGER LE CV : http://" . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) . "/uploads/" . $newname;
+                            }
+                        } else { 
+                            $error_msg = "Format invalide (PDF, DOC, DOCX, JPG, PNG uniquement)."; 
+                        }
+                    } else { 
+                        $error_msg = "Fichier trop lourd (max 5 Mo)."; 
+                    }
+                }
+
+                // Si pas d'erreur, on enregistre la candidature
+                if (empty($error_msg)) {
+                    $msg = "❤️ NOUVEAU BÉNÉVOLE !\n\nNom : $nom\nEmail : $email\nTéléphone : $tel\n\nDispos : $dispo\nAime faire : $skills\n\n$lien_cv";
+                    $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
+                    $stmt->execute([$nom, $email, $msg]);
+                    $benevole_ok = true;
+                }
+            }
         }
-    }
+    } // Fin de la vérification CSRF
 }
 
 // ========== PRÉ-REMPLISSAGE DES FORMULAIRES ==========
@@ -111,18 +162,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
 $nom_user = isset($_SESSION['membre_nom']) ? $_SESSION['membre_nom'] : "";
 $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 
-// ========== RÉCUPÉRATION DES ÉVÉNEMENTS ==========
+// ========== RÉCUPÉRATION DES ÉVÉNEMENTS AVEC PAGINATION ==========
 $search = "";
+$events_per_page = 6; // Nombre d'événements par page
+$current_page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$offset = ($current_page - 1) * $events_per_page;
+
 if (isset($_GET['search']) && !empty($_GET['search'])) {
-    // Recherche par mot-clé
+    // Recherche par mot-clé avec pagination
     $search = trim($_GET['search']);
-    $stmt = $pdo->prepare("SELECT * FROM evenements WHERE titre LIKE :s OR description LIKE :s OR lieu LIKE :s ORDER BY date_evenement DESC");
-    $stmt->execute(['s' => "%$search%"]);
+    
+    // Compter le nombre total de résultats
+    $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM evenements WHERE titre LIKE :s OR description LIKE :s OR lieu LIKE :s");
+    $count_stmt->execute(['s' => "%$search%"]);
+    $total_events = $count_stmt->fetchColumn();
+    
+    // Récupérer les événements pour la page actuelle
+    $stmt = $pdo->prepare("SELECT * FROM evenements WHERE titre LIKE :s OR description LIKE :s OR lieu LIKE :s ORDER BY date_evenement DESC LIMIT :limit OFFSET :offset");
+    $stmt->bindValue('s', "%$search%", PDO::PARAM_STR);
+    $stmt->bindValue('limit', $events_per_page, PDO::PARAM_INT);
+    $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
     $events = $stmt->fetchAll();
 } else {
-    // Tous les événements
-    $events = $pdo->query("SELECT * FROM evenements ORDER BY date_evenement DESC")->fetchAll();
+    // Compter le nombre total d'événements
+    $total_events = $pdo->query("SELECT COUNT(*) FROM evenements")->fetchColumn();
+    
+    // Récupérer les événements pour la page actuelle
+    $stmt = $pdo->prepare("SELECT * FROM evenements ORDER BY date_evenement DESC LIMIT :limit OFFSET :offset");
+    $stmt->bindValue('limit', $events_per_page, PDO::PARAM_INT);
+    $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $events = $stmt->fetchAll();
 }
+
+// Calculer le nombre total de pages
+$total_pages = ceil($total_events / $events_per_page);
 ?>
 
 <!DOCTYPE html>
@@ -130,456 +205,20 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aujourd'hui vers Demain</title>
+    <meta name="description" content="Aujourd'hui vers Demain - Association de quartier à Noisy-le-Sec. Aide aux devoirs, animations locales et bénévolat pour construire ensemble l'avenir de nos quartiers.">
+    <meta name="keywords" content="association, Noisy-le-Sec, aide aux devoirs, bénévolat, quartier, solidarité, enfants, soutien scolaire">
+    <meta name="author" content="Aujourd'hui vers Demain">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Aujourd'hui vers Demain - Association de quartier">
+    <meta property="og:description" content="Au cœur de Noisy-le-Sec, pour l'avenir de nos quartiers. Aide aux devoirs et animations locales.">
+    <meta property="og:type" content="website">
+    <title>Aujourd'hui vers Demain | Association de quartier à Noisy-le-Sec</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/mobile-responsive.css">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png">
-    <style>
-        body { transition: background-color 0.5s; }
-        .hero-banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-attachment: fixed; color: white; padding: 150px 0; }
-        
-        /* CSS POUR LES CARTES D'ÉVÉNEMENTS - ANIMATIONS PREMIUM */
-        .card-event {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            overflow: hidden;
-            position: relative;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-        
-        .card-event::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(13, 110, 253, 0.3) 0%, transparent 70%);
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            transition: width 0.6s ease, height 0.6s ease;
-            z-index: 1;
-            pointer-events: none;
-        }
-        
-        .card-event:hover { 
-            transform: translateY(-15px) rotateX(5deg) scale(1.02); 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25) !important;
-        }
-        
-        .card-event:active {
-            transform: translateY(-5px) scale(0.98);
-            transition: all 0.1s ease;
-        }
-        
-        .card-event:active::before {
-            width: 300%;
-            height: 300%;
-        }
-        
-        .card-event .card-img-top {
-            transition: transform 0.5s ease, filter 0.3s ease;
-        }
-        
-        .card-event:hover .card-img-top {
-            transform: scale(1.1);
-            filter: brightness(1.1);
-        }
-        
-        .card-event .card-body {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .card-event .badge {
-            transition: all 0.3s ease;
-        }
-        
-        .card-event:hover .badge {
-            transform: scale(1.1);
-            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
-        }
-        
-        /* Animation pulse au clic */
-        @keyframes cardPulse {
-            0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(13, 110, 253, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
-        }
-        
-        .card-event.clicked {
-            animation: cardPulse 0.6s ease-out;
-        }
-        
-        .hover-card {
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: pointer;
-        }
-        .hover-card:hover {
-            transform: translateY(-15px); /* Monte vers le haut */
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important; /* Ombre plus forte */
-            background-color: #fff;
-        }
-        .hover-card .emoji-icon {
-            display: inline-block;
-            transition: transform 0.3s;
-        }
-        .hover-card:hover .emoji-icon {
-            transform: scale(1.3) rotate(10deg); /* L'emoji grossit et tourne */
-        }
-        
-        /* ANIMATIONS STATISTIQUES */
-        .stat-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .hover-stat:hover {
-            transform: translateY(-15px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            background: rgba(255, 255, 255, 0.4) !important;
-        }
-        
-        .stat-icon {
-            transition: transform 0.4s ease;
-        }
-        
-        .hover-stat:hover .stat-icon {
-            transform: scale(1.2) rotate(360deg);
-        }
-        
-        .counter {
-            display: inline-block;
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .letter-spacing-wide {
-            letter-spacing: 2px;
-            font-weight: 600;
-        }
-        
-        /* Formes flottantes décoratives */
-        .floating-shape {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .shape-1 {
-            width: 100px;
-            height: 100px;
-            top: 10%;
-            left: 5%;
-            animation-delay: 0s;
-        }
-        
-        .shape-2 {
-            width: 150px;
-            height: 150px;
-            top: 60%;
-            right: 10%;
-            animation-delay: 2s;
-        }
-        
-        .shape-3 {
-            width: 80px;
-            height: 80px;
-            bottom: 15%;
-            left: 15%;
-            animation-delay: 4s;
-        }
-        
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 0.3;
-            }
-            50% {
-                transform: translateY(-30px) rotate(180deg);
-                opacity: 0.6;
-            }
-        }
-        
-        /* Animation pulse pour les icônes */
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-        }
-        
-        .stat-icon span {
-            display: inline-block;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        /* SECTION BÉNÉVOLAT */
-        .need-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        
-        .need-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
-        }
-        
-        .need-card .rounded-circle {
-            transition: transform 0.3s ease;
-        }
-        
-        .need-card:hover .rounded-circle {
-            transform: rotate(360deg) scale(1.1);
-        }
-        
-        .volunteer-form-card {
-            transition: transform 0.3s ease;
-        }
-        
-        .volunteer-form-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .volunteer-form-card .card-header {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .volunteer-form-card .card-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: shimmer 3s infinite;
-        }
-        
-        @keyframes shimmer {
-            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-            50% { transform: translate(-30%, -30%) rotate(180deg); }
-        }
-        
-        /* ADAPTATION MODE SOMBRE POUR SECTION BÉNÉVOLAT */
-        .benevolat-section {
-            background: var(--bs-body-bg);
-        }
-        
-        /* Overlay avec gradient adaptatif */
-        .benevolat-bg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.4;
-            background-image: radial-gradient(circle at 20% 50%, rgba(13, 110, 253, 0.15) 0%, transparent 50%), 
-                              radial-gradient(circle at 80% 80%, rgba(255, 193, 7, 0.15) 0%, transparent 50%);
-        }
-        
-        /* Mode clair */
-        [data-bs-theme="light"] .benevolat-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-        
-        [data-bs-theme="light"] .benevolat-text {
-            color: #6c757d !important;
-        }
-        
-        [data-bs-theme="light"] .benevolat-alert {
-            background-color: #f8f9fa;
-            color: #212529;
-        }
-        
-        [data-bs-theme="light"] .benevolat-alert-text {
-            color: #6c757d !important;
-        }
-        
-        [data-bs-theme="light"] .need-card {
-            background-color: #ffffff !important;
-            color: #212529;
-        }
-        
-        [data-bs-theme="light"] .need-card-text {
-            color: #6c757d !important;
-        }
-        
-        [data-bs-theme="light"] .benevolat-footer-text {
-            color: #6c757d !important;
-        }
-        
-        /* Mode sombre */
-        [data-bs-theme="dark"] .benevolat-section {
-            background: linear-gradient(135deg, #1a1d20 0%, #2d3238 100%);
-        }
-        
-        [data-bs-theme="dark"] .benevolat-text {
-            color: #adb5bd !important;
-        }
-        
-        [data-bs-theme="dark"] .benevolat-alert {
-            background-color: rgba(13, 110, 253, 0.15);
-            color: #f8f9fa;
-            border-color: #0d6efd !important;
-        }
-        
-        [data-bs-theme="dark"] .benevolat-alert-text {
-            color: #adb5bd !important;
-        }
-        
-        [data-bs-theme="dark"] .need-card {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            color: #f8f9fa;
-            backdrop-filter: blur(10px);
-        }
-        
-        [data-bs-theme="dark"] .need-card:hover {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        [data-bs-theme="dark"] .need-card-text {
-            color: #adb5bd !important;
-        }
-        
-        [data-bs-theme="dark"] .benevolat-footer-text {
-            color: #adb5bd !important;
-        }
-        
-        /* HEADER FORMULAIRE - ADAPTATION THÈME */
-        /* Mode clair : texte noir sur fond blanc/clair */
-        [data-bs-theme="light"] .form-header-title,
-        [data-bs-theme="light"] .form-header-subtitle {
-            color: #212529 !important;
-        }
-        
-        /* Mode sombre : texte blanc sur fond sombre */
-        [data-bs-theme="dark"] .form-header-title,
-        [data-bs-theme="dark"] .form-header-subtitle {
-            color: #ffffff !important;
-        }
-        
-        /* SECTION ACTIONS - ADAPTATION THÈME */
-        .actions-section {
-            background: var(--bs-body-bg);
-        }
-        
-        .actions-icon-wrapper {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            transition: transform 0.3s ease;
-        }
-        
-        .actions-info-card:hover .actions-icon-wrapper {
-            transform: rotate(10deg) scale(1.1);
-        }
-        
-        .info-badge {
-            transition: all 0.3s ease;
-        }
-        
-        .info-badge:hover {
-            transform: translateY(-3px);
-        }
-        
-        /* Mode clair */
-        [data-bs-theme="light"] .actions-subtitle {
-            color: #6c757d;
-        }
-        
-        [data-bs-theme="light"] .actions-info-card {
-            background: #ffffff;
-            border: 1px solid #e9ecef;
-        }
-        
-        [data-bs-theme="light"] .actions-icon-wrapper {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-        }
-        
-        [data-bs-theme="light"] .actions-title {
-            color: #212529;
-        }
-        
-        [data-bs-theme="light"] .actions-text {
-            color: #6c757d;
-        }
-        
-        [data-bs-theme="light"] .actions-border {
-            border-color: #e9ecef !important;
-        }
-        
-        [data-bs-theme="light"] .actions-subtitle-small {
-            color: #495057;
-        }
-        
-        [data-bs-theme="light"] .info-badge {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-        }
-        
-        [data-bs-theme="light"] .actions-label {
-            color: #6c757d;
-        }
-        
-        [data-bs-theme="light"] .actions-value {
-            color: #212529;
-        }
-        
-        /* Mode sombre */
-        [data-bs-theme="dark"] .actions-subtitle {
-            color: #adb5bd;
-        }
-        
-        [data-bs-theme="dark"] .actions-info-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        [data-bs-theme="dark"] .actions-icon-wrapper {
-            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-        }
-        
-        [data-bs-theme="dark"] .actions-title {
-            color: #f8f9fa;
-        }
-        
-        [data-bs-theme="dark"] .actions-text {
-            color: #adb5bd;
-        }
-        
-        [data-bs-theme="dark"] .actions-border {
-            border-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        [data-bs-theme="dark"] .actions-subtitle-small {
-            color: #dee2e6;
-        }
-        
-        [data-bs-theme="dark"] .info-badge {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-        }
-        
-        [data-bs-theme="dark"] .actions-label {
-            color: #868e96;
-        }
-        
-        [data-bs-theme="dark"] .actions-value {
-            color: #f8f9fa;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/index.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -590,8 +229,8 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
             <h1 class="display-3 fw-bold" data-aos="fade-down">Construire demain, dès aujourd'hui.</h1>
             <p class="lead mb-4" data-aos="fade-in">Au cœur de Noisy-le-Sec, pour l'avenir de nos quartiers.</p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center" data-aos="zoom-in">
-                <a href="#actions" class="btn btn-warning btn-lg rounded-pill shadow fw-bold"><i class="bi bi-book-fill me-2"></i>Aide aux devoirs</a>
-                <a href="#benevolat" class="btn btn-outline-light btn-lg rounded-pill"><i class="bi bi-people-fill me-2"></i>Devenir Bénévole</a>
+                <a href="#actions" class="btn btn-warning btn-lg rounded-pill shadow fw-bold" aria-label="Découvrir l'aide aux devoirs"><i class="bi bi-book-fill me-2" aria-hidden="true"></i>Aide aux devoirs</a>
+                <a href="#benevolat" class="btn btn-outline-light btn-lg rounded-pill" aria-label="Devenir bénévole de l'association"><i class="bi bi-people-fill me-2" aria-hidden="true"></i>Devenir Bénévole</a>
             </div>
         </div>
     </div>
@@ -656,7 +295,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                 </p>
             </div>
             <div class="col-lg-6" data-aos="zoom-in">
-                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Équipe" class="img-fluid rounded-4 shadow-lg">
+                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Équipe de bénévoles de l'association Aujourd'hui vers Demain" class="img-fluid rounded-4 shadow-lg" loading="lazy">
             </div>
         </div>
     </div>
@@ -740,7 +379,9 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                         <?php if ($est_connecte): ?>
                             
                             <?php if ($inscription_ok): ?><div class="alert alert-success"><i class="bi bi-check-circle-fill me-2"></i>Inscription envoyée !</div><?php endif; ?>
+                            <?php if (!empty($error_msg) && isset($_POST['form_type']) && $_POST['form_type'] == 'devoirs'): ?><div class="alert alert-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i><?= htmlspecialchars($error_msg) ?></div><?php endif; ?>
                             <form method="POST" action="#actions">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                                 <input type="hidden" name="form_type" value="devoirs">
                                 <div class="row">
                                     <div class="col-6 mb-3"><label>Nom enfant</label><input type="text" name="nom" class="form-control" required></div>
@@ -924,6 +565,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                             <?php if (!empty($error_msg)): ?><div class="alert alert-danger"><?= $error_msg ?></div><?php endif; ?>
 
                             <form method="POST" action="#benevolat" enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                                 <input type="hidden" name="form_type" value="benevolat">
                                 <div class="mb-3"><label>Nom & Prénom</label><input type="text" name="nom" class="form-control" value="<?= htmlspecialchars($nom_user) ?>" required></div>
                                 <div class="row">
@@ -942,7 +584,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                                 <h5 class="fw-bold">Espace réservé</h5>
                                 <p class="text-muted mb-4">Vous devez être membre pour postuler.</p>
                                 <div class="d-grid gap-2">
-                                    <a href="auth/login.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
+                                    <a href="auth/connexion.php" class="btn btn-primary rounded-pill fw-bold">Se connecter</a>
                                     <a href="auth/inscription.php" class="btn btn-outline-primary rounded-pill fw-bold">Créer un compte</a>
                                 </div>
                             </div>
@@ -959,10 +601,10 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
         
         <div class="row justify-content-center mb-5">
             <div class="col-md-6">
-                <form method="GET" action="#events" class="d-flex gap-2 p-2 bg-body-tertiary rounded-pill shadow" style="position: relative; z-index: 10;">
-                    <input type="text" name="search" class="form-control border-0 bg-transparent rounded-pill ps-4" placeholder="Rechercher..." value="<?= htmlspecialchars($search) ?>" style="cursor: text;">
-                    <button class="btn btn-primary rounded-circle" type="submit" style="min-width: 45px;">🔍</button>
-                    <?php if(!empty($search)): ?><a href="index.php#events" class="btn btn-secondary rounded-circle" style="min-width: 45px;">✖</a><?php endif; ?>
+                <form method="GET" action="#events" class="d-flex gap-2 p-2 bg-body-tertiary rounded-pill shadow" style="position: relative; z-index: 10;" role="search">
+                    <input type="text" name="search" class="form-control border-0 bg-transparent rounded-pill ps-4" placeholder="Rechercher un événement..." value="<?= htmlspecialchars($search) ?>" style="cursor: text;" aria-label="Rechercher un événement">
+                    <button class="btn btn-primary rounded-circle" type="submit" style="min-width: 45px;" aria-label="Lancer la recherche"><i class="bi bi-search"></i></button>
+                    <?php if(!empty($search)): ?><a href="index.php#events" class="btn btn-secondary rounded-circle" style="min-width: 45px;" aria-label="Effacer la recherche"><i class="bi bi-x-lg"></i></a><?php endif; ?>
                 </form>
             </div>
         </div>
@@ -975,7 +617,7 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                     <div class="col-md-4 mb-3" data-aos="fade-up">
                         <div class="card h-100 shadow border-0 card-event">
                             <?php if (!empty($evt['image'])): ?>
-                                <img src="uploads/<?= htmlspecialchars($evt['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($evt['titre']) ?>" style="height: 200px; object-fit: cover;">
+                                <img src="uploads/<?= htmlspecialchars($evt['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($evt['titre']) ?>" style="height: 200px; object-fit: cover;" loading="lazy">
                             <?php endif; ?>
                             <div class="card-body">
                                 <span class="badge bg-warning text-dark mb-2"><?= date('d/m/Y', strtotime($evt['date_evenement'])) ?></span>
@@ -987,81 +629,82 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
                     </div>
                 <?php endforeach; ?>
             </div>
+            
+            <!-- Pagination -->
+            <?php if ($total_pages > 1): ?>
+            <nav aria-label="Navigation des événements" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <!-- Bouton Précédent -->
+                    <?php if ($current_page > 1): ?>
+                        <li class="page-item">
+                            <a class="page-link rounded-pill me-1" href="?page=<?= $current_page - 1 ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>#events" aria-label="Page précédente">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                    
+                    <!-- Numéros de page -->
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item <?= $i == $current_page ? 'active' : '' ?>">
+                            <a class="page-link rounded-pill mx-1" href="?page=<?= $i ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>#events" <?= $i == $current_page ? 'aria-current="page"' : '' ?>>
+                                <?= $i ?>
+                            </a>
+                        </li>
+                    <?php endfor; ?>
+                    
+                    <!-- Bouton Suivant -->
+                    <?php if ($current_page < $total_pages): ?>
+                        <li class="page-item">
+                            <a class="page-link rounded-pill ms-1" href="?page=<?= $current_page + 1 ?><?= !empty($search) ? '&search=' . urlencode($search) : '' ?>#events" aria-label="Page suivante">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+                <p class="text-center text-muted small mb-0">
+                    Affichage de <?= count($events) ?> événement<?= count($events) > 1 ? 's' : '' ?> sur <?= $total_events ?>
+                </p>
+            </nav>
+            <?php endif; ?>
+            
         <?php endif; ?>
     </div>
 
+    <!-- Section Call-to-Action -->
+    <section class="py-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);" data-aos="fade-up">
+        <div class="container position-relative" style="z-index: 2;">
+            <div class="row align-items-center">
+                <div class="col-lg-8 text-white mb-4 mb-lg-0">
+                    <h2 class="display-6 fw-bold mb-3">
+                        <i class="bi bi-heart-fill me-2" aria-hidden="true"></i>Envie de nous soutenir ?
+                    </h2>
+                    <p class="lead mb-0 opacity-90">
+                        Chaque geste compte ! Que ce soit par un don, du temps, ou simplement en parlant de nous autour de vous, vous participez à l'avenir de notre quartier.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-lg-end">
+                        <a href="pages/contact.php" class="btn btn-light btn-lg rounded-pill fw-bold shadow-sm" aria-label="Nous contacter">
+                            <i class="bi bi-envelope-fill me-2" aria-hidden="true"></i>Nous contacter
+                        </a>
+                        <a href="#benevolat" class="btn btn-outline-light btn-lg rounded-pill fw-bold" aria-label="Rejoindre notre équipe de bénévoles">
+                            <i class="bi bi-hand-thumbs-up-fill me-2" aria-hidden="true"></i>Rejoindre l'équipe
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Décorations flottantes -->
+        <div class="floating-shape" style="width: 200px; height: 200px; top: -50px; right: -50px; opacity: 0.1;"></div>
+        <div class="floating-shape" style="width: 150px; height: 150px; bottom: -30px; left: 10%; opacity: 0.1;"></div>
+    </section>
+
     <?php include 'includes/footer.php'; ?>
+    
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="assets/js/script_theme.js"></script>
-    
-    <script>
-        // Animation des compteurs
-        function animateCounter(element) {
-            const target = parseInt(element.getAttribute('data-target'));
-            const duration = 2000; // 2 secondes
-            const start = parseInt(element.textContent);
-            const increment = (target - start) / (duration / 16); // 60 FPS
-            let current = start;
-            
-            const timer = setInterval(() => {
-                current += increment;
-                if ((increment > 0 && current >= target) || (increment < 0 && current <= target)) {
-                    element.textContent = target;
-                    clearInterval(timer);
-                } else {
-                    element.textContent = Math.floor(current);
-                }
-            }, 16);
-        }
-        
-        // Détecter quand les compteurs sont visibles
-        const observerOptions = {
-            threshold: 0.5,
-            rootMargin: '0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const counters = entry.target.querySelectorAll('.counter');
-                    counters.forEach(counter => {
-                        if (!counter.classList.contains('animated')) {
-                            counter.classList.add('animated');
-                            animateCounter(counter);
-                        }
-                    });
-                }
-            });
-        }, observerOptions);
-        
-        // Observer la section des statistiques
-        document.addEventListener('DOMContentLoaded', () => {
-            const statsSection = document.querySelector('.bg-warning');
-            if (statsSection) {
-                observer.observe(statsSection);
-            }
-            
-            // Initialiser AOS
-            AOS.init({
-                duration: 800,
-                once: true,
-                offset: 100
-            });
-            
-            // Animation au clic sur les cartes d'événements
-            document.querySelectorAll('.card-event').forEach(card => {
-                card.addEventListener('click', function(e) {
-                    // Ajoute la classe pour l'animation pulse
-                    this.classList.add('clicked');
-                    
-                    // Retire la classe après l'animation
-                    setTimeout(() => {
-                        this.classList.remove('clicked');
-                    }, 600);
-                });
-            });
-        });
-    </script>
+    <script src="assets/js/index.js"></script>
 </body>
 </html>

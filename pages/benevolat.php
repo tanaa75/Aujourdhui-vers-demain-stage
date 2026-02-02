@@ -22,6 +22,9 @@ session_start();
 // Connexion à la base de données
 require_once '../includes/db.php';
 
+// Inclusion des fonctions de sécurité pour CSRF
+require_once '../includes/security.php';
+
 // Variables de suivi
 $benevole_ok = false;     // Candidature envoyée ?
 $error_msg = "";          // Message d'erreur éventuel
@@ -31,8 +34,10 @@ $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 
 // ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_connecte) {
-    
-    if ($_POST['form_type'] == 'benevolat') {
+    // Vérification CSRF
+    if (!isset($_POST['csrf_token']) || !verifier_token_csrf($_POST['csrf_token'])) {
+        $error_msg = "Erreur de sécurité. Veuillez réessayer.";
+    } elseif ($_POST['form_type'] == 'benevolat') {
         // Récupération des données
         $nom = $_POST['nom'];
         $email = $_POST['email'];
@@ -93,158 +98,15 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nous Rejoindre - Aujourd'hui vers Demain</title>
+    <meta name="description" content="Devenez bénévole chez Aujourd'hui vers Demain. Rejoignez notre équipe et participez à la vie du quartier.">
+    <meta name="robots" content="index, follow">
+    <title>Devenir Bénévole | Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <style>
-        body { transition: background-color 0.5s; }
-        
-        /* SECTION BÉNÉVOLAT */
-        .need-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-        
-        .need-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
-        }
-        
-        .need-card .rounded-circle {
-            transition: transform 0.3s ease;
-        }
-        
-        .need-card:hover .rounded-circle {
-            transform: rotate(360deg) scale(1.1);
-        }
-        
-        .volunteer-form-card {
-            transition: transform 0.3s ease;
-        }
-        
-        .volunteer-form-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .volunteer-form-card .card-header {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .volunteer-form-card .card-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: shimmer 3s infinite;
-        }
-        
-        @keyframes shimmer {
-            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-            50% { transform: translate(-30%, -30%) rotate(180deg); }
-        }
-        
-        /* ADAPTATION MODE SOMBRE POUR SECTION BÉNÉVOLAT */
-        .benevolat-section {
-            background: var(--bs-body-bg);
-        }
-        
-        .benevolat-bg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.4;
-            background-image: radial-gradient(circle at 20% 50%, rgba(13, 110, 253, 0.15) 0%, transparent 50%), 
-                              radial-gradient(circle at 80% 80%, rgba(255, 193, 7, 0.15) 0%, transparent 50%);
-        }
-        
-        /* Mode clair */
-        [data-bs-theme="light"] .benevolat-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-        
-        [data-bs-theme="light"] .benevolat-text {
-            color: #6c757d !important;
-        }
-        
-        [data-bs-theme="light"] .benevolat-alert {
-            background-color: #f8f9fa;
-            color: #212529;
-        }
-        
-        [data-bs-theme="light"] .benevolat-alert-text {
-            color: #6c757d !important;
-        }
-        
-        [data-bs-theme="light"] .need-card {
-            background-color: #ffffff !important;
-            color: #212529;
-        }
-        
-        [data-bs-theme="light"] .need-card-text {
-            color: #6c757d !important;
-        }
-        
-        [data-bs-theme="light"] .benevolat-footer-text {
-            color: #6c757d !important;
-        }
-        
-        /* Mode sombre */
-        [data-bs-theme="dark"] .benevolat-section {
-            background: linear-gradient(135deg, #1a1d20 0%, #2d3238 100%);
-        }
-        
-        [data-bs-theme="dark"] .benevolat-text {
-            color: #adb5bd !important;
-        }
-        
-        [data-bs-theme="dark"] .benevolat-alert {
-            background-color: rgba(13, 110, 253, 0.15);
-            color: #f8f9fa;
-            border-color: #0d6efd !important;
-        }
-        
-        [data-bs-theme="dark"] .benevolat-alert-text {
-            color: #adb5bd !important;
-        }
-        
-        [data-bs-theme="dark"] .need-card {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            color: #f8f9fa;
-            backdrop-filter: blur(10px);
-        }
-        
-        [data-bs-theme="dark"] .need-card:hover {
-            background-color: rgba(255, 255, 255, 0.1) !important;
-        }
-        
-        [data-bs-theme="dark"] .need-card-text {
-            color: #adb5bd !important;
-        }
-        
-        [data-bs-theme="dark"] .benevolat-footer-text {
-            color: #adb5bd !important;
-        }
-        
-        /* HEADER FORMULAIRE - ADAPTATION THÈME */
-        [data-bs-theme="light"] .form-header-title,
-        [data-bs-theme="light"] .form-header-subtitle {
-            color: #212529 !important;
-        }
-        
-        [data-bs-theme="dark"] .form-header-title,
-        [data-bs-theme="dark"] .form-header-subtitle {
-            color: #ffffff !important;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/benevolat.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php include '../includes/navbar.php'; ?>
@@ -368,6 +230,7 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                             <?php endif; ?>
 
                             <form method="POST" enctype="multipart/form-data">
+                                <?= champ_csrf() ?>
                                 <input type="hidden" name="form_type" value="benevolat">
                                 
                                 <div class="mb-3">

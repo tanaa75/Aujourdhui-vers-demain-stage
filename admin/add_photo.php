@@ -28,6 +28,9 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once '../includes/db.php';
 
+// Inclusion des fonctions de sécurité pour CSRF
+require_once '../includes/security.php';
+
 $message = "";
 $message_type = "";
 
@@ -45,6 +48,11 @@ $categories_predefinies = [
 
 // ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Vérification CSRF
+    if (!isset($_POST['csrf_token']) || !verifier_token_csrf($_POST['csrf_token'])) {
+        $message = "Erreur de sécurité. Veuillez réessayer.";
+        $message_type = "danger";
+    } else {
     
     $titre = trim($_POST['titre']);
     $description = trim($_POST['description']);
@@ -90,6 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
+    }
 }
 ?>
 
@@ -98,78 +107,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter une photo - Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Ajouter une photo | Admin - Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
-    <style>
-        body { transition: background-color 0.5s, color 0.5s; }
-        
-        .upload-zone {
-            border: 3px dashed #dee2e6;
-            border-radius: 16px;
-            padding: 40px;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background: rgba(0,0,0,0.02);
-        }
-        
-        .upload-zone:hover {
-            border-color: #0d6efd;
-            background: rgba(13, 110, 253, 0.05);
-        }
-        
-        .upload-zone.dragover {
-            border-color: #0d6efd;
-            background: rgba(13, 110, 253, 0.1);
-            transform: scale(1.02);
-        }
-        
-        .upload-zone i {
-            font-size: 3rem;
-            color: #6c757d;
-            transition: color 0.3s ease;
-        }
-        
-        .upload-zone:hover i {
-            color: #0d6efd;
-        }
-        
-        .preview-container {
-            display: none;
-            margin-top: 20px;
-        }
-        
-        .preview-container img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .form-card {
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        
-        .form-card .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 25px;
-        }
-        
-        /* Mode sombre */
-        [data-bs-theme="dark"] .upload-zone {
-            border-color: #495057;
-            background: rgba(255,255,255,0.02);
-        }
-        
-        [data-bs-theme="dark"] .upload-zone:hover {
-            border-color: #0d6efd;
-            background: rgba(13, 110, 253, 0.1);
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body class="bg-body-tertiary">
     <?php include '../includes/navbar.php'; ?>
@@ -204,6 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <?php endif; ?>
                         
                         <form method="POST" enctype="multipart/form-data">
+                            <?= champ_csrf() ?>
                             
                             <!-- Zone d'upload -->
                             <div class="mb-4">

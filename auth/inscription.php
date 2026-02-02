@@ -113,43 +113,14 @@ if (isset($_SESSION['inscription_temp']) && $step == 1) {
 <html lang="fr" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
-    <title>Inscription - Aujourd'hui vers Demain</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Créez votre compte membre Aujourd'hui vers Demain et rejoignez notre communauté.">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Inscription | Aujourd'hui vers Demain</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
-    
-    <style>
-        body {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-
-        .card-custom {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: none;
-            width: 100%;
-            max-width: 450px;
-        }
-        
-        .letter-spacing-2 {
-            letter-spacing: 8px;
-        }
-        
-        .code-input {
-            font-size: 1.5rem;
-            text-align: center;
-            letter-spacing: 10px;
-            font-weight: bold;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
 <body>
 

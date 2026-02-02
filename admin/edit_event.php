@@ -48,8 +48,15 @@ if (!$event) {
 // Variable pour les messages
 $message = "";
 
+// Inclusion des fonctions de sécurité pour CSRF
+require_once '../includes/security.php';
+
 // ========== TRAITEMENT DU FORMULAIRE ==========
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Vérification CSRF
+    if (!isset($_POST['csrf_token']) || !verifier_token_csrf($_POST['csrf_token'])) {
+        $message = "<div class='alert alert-danger'>Erreur de sécurité. Veuillez réessayer.</div>";
+    } else {
     // Récupération des données
     $titre = $_POST['titre'];
     $description = $_POST['description'];
@@ -89,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     } catch (PDOException $e) {
         $message = "<div class='alert alert-danger'>❌ Erreur SQL : " . $e->getMessage() . "</div>";
+        }
     }
 }
 ?>
@@ -98,49 +106,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier l'événement</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Modifier l'événement | Admin - Aujourd'hui vers Demain</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <style>
-        body {
-            /* MÊME FOND QUE LE LOGIN ET ADD EVENT */
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            min-height: 100vh;
-        }
-
-        .card-custom {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        }
-
-        .form-control, .form-control:focus {
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-        }
-        
-        .input-locked {
-            background-color: #e9ecef !important;
-            cursor: not-allowed;
-            color: #6c757d;
-        }
-
-        .current-img-preview {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #dee2e6;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
-<body>
+<body class="admin-form-page">
 
     <?php include '../includes/navbar.php'; ?>
 
@@ -148,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="row justify-content-center">
             <div class="col-lg-8">
                 
-                <div class="card card-custom p-4 p-md-5">
+                <div class="card card-form p-4 p-md-5">
                     
                     <div class="d-flex align-items-center mb-4 border-bottom pb-3">
                         <i class="bi bi-pencil-square text-warning display-6 me-3"></i>
@@ -158,6 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <?= $message ?>
 
                     <form method="POST" enctype="multipart/form-data">
+                        <?= champ_csrf() ?>
                         
                         <div class="row">
                             <div class="col-md-12 mb-3">

@@ -13,8 +13,9 @@
  * - Carte Google Maps intégrée
  * 
  * Sécurité :
+ * - Protection CSRF
+ * - Validation et nettoyage des entrées
  * - Seuls les utilisateurs connectés peuvent envoyer un message
- * - Les données sont pré-remplies si l'utilisateur est connecté
  */
 
 // Démarrage de la session
@@ -23,21 +24,41 @@ session_start();
 // Connexion à la base de données
 require_once '../includes/db.php';
 
-// Variable pour suivre si le message a été envoyé
+// ========== PROTECTION CSRF ==========
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
+
+// Variables de suivi
 $msg_envoye = false;
+$error_msg = "";
 
 // Vérification : est-ce qu'un membre OU un admin est connecté ?
 $est_connecte = (isset($_SESSION['membre_id']) || isset($_SESSION['user_id']));
 
 // ========== TRAITEMENT DU FORMULAIRE ==========
-// On traite seulement si l'utilisateur est connecté
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $est_connecte) {
-    // Vérification que tous les champs sont remplis
-    if (!empty($_POST['nom']) && !empty($_POST['email']) && !empty($_POST['message'])) {
-        // Insertion du message en base de données
-        $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
-        $stmt->execute([$_POST['nom'], $_POST['email'], $_POST['message']]);
-        $msg_envoye = true;
+    // Vérification du token CSRF
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error_msg = "Erreur de sécurité. Veuillez réessayer.";
+    } else {
+        // Nettoyage des entrées
+        $nom = trim(htmlspecialchars($_POST['nom'] ?? '', ENT_QUOTES, 'UTF-8'));
+        $email = filter_var($_POST['email'] ?? '', FILTER_SANITIZE_EMAIL);
+        $message = trim(htmlspecialchars($_POST['message'] ?? '', ENT_QUOTES, 'UTF-8'));
+        
+        // Validation
+        if (empty($nom) || empty($email) || empty($message)) {
+            $error_msg = "Tous les champs sont obligatoires.";
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error_msg = "Adresse email invalide.";
+        } else {
+            // Insertion du message en base de données
+            $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
+            $stmt->execute([$nom, $email, $message]);
+            $msg_envoye = true;
+        }
     }
 }
 
@@ -51,186 +72,15 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact - Aujourd'hui vers Demain</title>
+    <meta name="description" content="Contactez l'association Aujourd'hui vers Demain. Nous sommes à votre écoute pour tout projet ou question.">
+    <meta name="robots" content="index, follow">
+    <title>Contact | Aujourd'hui vers Demain - Association Noisy-le-Sec</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2904/2904869.png" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/mobile-responsive.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <style>
-        body { transition: background-color 0.5s, color 0.5s; }
-        
-        /* HEADER CONTACT */
-        .contact-header {
-            position: relative;
-            padding: 60px 0 40px;
-            overflow: hidden;
-        }
-        
-        .contact-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.05;
-            background-image: radial-gradient(circle at 30% 50%, rgba(13, 110, 253, 0.3) 0%, transparent 50%);
-        }
-        
-        .contact-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
-            color: white;
-            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.35);
-        }
-        
-        /* CARTES CONTACT */
-        .contact-form-card {
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .contact-form-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .contact-info-card {
-            border-radius: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .contact-info-card:hover {
-            transform: translateY(-3px);
-        }
-        
-        .contact-info-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .contact-info-item:hover {
-            transform: translateX(5px);
-        }
-        
-        .contact-info-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-        
-        .contact-info-item:hover .contact-info-icon {
-            transform: scale(1.1);
-        }
-        
-        .map-container {
-            border-radius: 16px;
-            overflow: hidden;
-        }
-        
-        .map-container iframe {
-            width: 100%;
-            height: 250px;
-            border: none;
-        }
-        
-        /* MODE CLAIR */
-        [data-bs-theme="light"] .contact-header {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-        
-        [data-bs-theme="light"] .contact-title {
-            color: #0d6efd;
-        }
-        
-        [data-bs-theme="light"] .contact-subtitle {
-            color: #6c757d;
-        }
-        
-        [data-bs-theme="light"] .contact-form-card {
-            background: #ffffff;
-            border: 1px solid #e9ecef;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        }
-        
-        [data-bs-theme="light"] .contact-info-item {
-            background: #f8f9fa;
-        }
-        
-        [data-bs-theme="light"] .contact-info-icon {
-            background: rgba(13, 110, 253, 0.1);
-            color: #0d6efd;
-            border: 2px solid rgba(13, 110, 253, 0.2);
-        }
-        
-        [data-bs-theme="light"] .contact-info-label {
-            color: #6c757d;
-            font-size: 0.85rem;
-        }
-        
-        [data-bs-theme="light"] .contact-info-value {
-            color: #212529;
-            font-weight: 600;
-        }
-        
-        /* MODE SOMBRE */
-        [data-bs-theme="dark"] .contact-header {
-            background: linear-gradient(135deg, #1a1d20 0%, #2d3238 100%);
-        }
-        
-        [data-bs-theme="dark"] .contact-title {
-            color: #ffc107;
-        }
-        
-        [data-bs-theme="dark"] .contact-subtitle {
-            color: #adb5bd;
-        }
-        
-        [data-bs-theme="dark"] .contact-form-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-        
-        [data-bs-theme="dark"] .contact-info-item {
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        [data-bs-theme="dark"] .contact-info-icon {
-            background: rgba(13, 110, 253, 0.15);
-            color: #4dabf7;
-            border: 2px solid rgba(13, 110, 253, 0.3);
-        }
-        
-        [data-bs-theme="dark"] .contact-info-label {
-            color: #868e96;
-            font-size: 0.85rem;
-        }
-        
-        [data-bs-theme="dark"] .contact-info-value {
-            color: #f8f9fa;
-            font-weight: 600;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/contact.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <?php include '../includes/navbar.php'; ?>
@@ -261,22 +111,28 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                     <i class="bi bi-check-circle-fill me-2"></i>Message envoyé ! On vous répond très vite.
                                 </div>
                             <?php endif; ?>
+                            <?php if (!empty($error_msg)): ?>
+                                <div class="alert alert-danger text-center border-0 shadow-sm">
+                                    <i class="bi bi-exclamation-triangle-fill me-2"></i><?= htmlspecialchars($error_msg) ?>
+                                </div>
+                            <?php endif; ?>
 
                             <form method="POST">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token) ?>">
                                 <div class="form-floating mb-3">
-                                    <input type="text" name="nom" class="form-control rounded-3" id="floatingNom" required placeholder="Nom" value="<?= htmlspecialchars($nom_user) ?>">
+                                    <input type="text" name="nom" class="form-control rounded-3" id="floatingNom" required placeholder="Nom" value="<?= htmlspecialchars($nom_user) ?>" aria-label="Votre nom">
                                     <label for="floatingNom">Votre Nom</label>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <input type="email" name="email" class="form-control rounded-3" id="floatingEmail" required placeholder="Email" value="<?= htmlspecialchars($email_user) ?>">
+                                    <input type="email" name="email" class="form-control rounded-3" id="floatingEmail" required placeholder="Email" value="<?= htmlspecialchars($email_user) ?>" aria-label="Votre email">
                                     <label for="floatingEmail">Votre Email</label>
                                 </div>
                                 <div class="form-floating mb-4">
-                                    <textarea name="message" class="form-control rounded-3" id="floatingMsg" style="height: 150px" required placeholder="Message"></textarea>
+                                    <textarea name="message" class="form-control rounded-3" id="floatingMsg" style="height: 150px" required placeholder="Message" aria-label="Votre message"></textarea>
                                     <label for="floatingMsg">Votre Message</label>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow">
-                                    <i class="bi bi-send-fill me-2"></i>Envoyer le message
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow" aria-label="Envoyer le message">
+                                    <i class="bi bi-send-fill me-2" aria-hidden="true"></i>Envoyer le message
                                 </button>
                             </form>
 
