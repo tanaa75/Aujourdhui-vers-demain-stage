@@ -296,7 +296,7 @@ $total_pages = ceil($total_events / $events_per_page);
                 </p>
             </div>
             <div class="col-lg-6" data-aos="zoom-in">
-                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Équipe de bénévoles de l'association Aujourd'hui vers Demain" class="img-fluid rounded-4 shadow-lg" loading="lazy">
+                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Enfants faisant leurs devoirs avec un bénévole" class="img-fluid rounded-4 shadow-lg" loading="lazy">
             </div>
         </div>
     </div>
@@ -700,6 +700,11 @@ $total_pages = ceil($total_events / $events_per_page);
         <div class="floating-shape" style="width: 200px; height: 200px; top: -50px; right: -50px; opacity: 0.1;"></div>
         <div class="floating-shape" style="width: 150px; height: 150px; bottom: -30px; left: 10%; opacity: 0.1;"></div>
     </section>
+
+    <!-- Bouton flottant Contact -->
+    <a href="pages/contact.php" class="floating-contact-btn" title="Nous contacter">
+        <i class="bi bi-chat-dots-fill"></i>
+    </a>
 
     <?php include 'includes/footer.php'; ?>
     
