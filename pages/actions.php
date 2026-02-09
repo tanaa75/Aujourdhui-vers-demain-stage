@@ -43,11 +43,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
         $nom = $_POST['nom'];
         $prenom = $_POST['prenom'];
         $classe = $_POST['classe'];
+        $adresse = $_POST['adresse'];
         $tel = $_POST['tel'];
         $email = $_POST['email'];
         
         // Construction du message formaté
-        $message_complet = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel\nEmail parent : $email";
+        $message_complet = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nAdresse : $adresse\nTéléphone : $tel\nEmail parent : $email";
         
         // Insertion en base de données
         $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
@@ -170,6 +171,10 @@ $email_user = isset($_SESSION['membre_email']) ? $_SESSION['membre_email'] : "";
                                 <div class="mb-3">
                                     <label>Email du parent</label>
                                     <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($email_user) ?>" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label>Adresse</label>
+                                    <input type="text" name="adresse" class="form-control" placeholder="Ex: 12 rue de la Paix, 93000 Bobigny" required>
                                 </div>
 
                                 <div class="row">

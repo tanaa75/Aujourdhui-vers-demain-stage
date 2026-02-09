@@ -15,7 +15,7 @@
 
 ---
 
-![Aperçu de l'application](image_71fdc5.jpg)
+![Aperçu de l'application](docs/screenshots/hero_preview.jpg)
 
 </div>
 
@@ -31,8 +31,9 @@ L'association **Aujourd'hui vers Demain** accompagne les habitants du quartier d
 |----------|-------------|
 | 🗄️ **Base de données** | Conception et modélisation d'une BDD relationnelle complète |
 | 💻 **Développement Full-Stack** | Interface utilisateur moderne + logique serveur robuste |
-| 🔐 **Back-Office sécurisé** | Espace d'administration pour l'association |
+| 🔐 **Back-Office sécurisé** | Espace d'administration complet pour l'association |
 | 📱 **Responsive Design** | Compatible mobile, tablette et desktop |
+| 📊 **Exports professionnels** | Export Excel, CSV et génération de reçus PDF |
 
 ---
 
@@ -49,6 +50,7 @@ L'association **Aujourd'hui vers Demain** accompagne les habitants du quartier d
 - Animations fluides (AOS Library)
 - Mode Sombre / Clair
 - Section héro dynamique
+- Statistiques animées
 
 </td>
 <td width="50%">
@@ -56,19 +58,19 @@ L'association **Aujourd'hui vers Demain** accompagne les habitants du quartier d
 **📅 Gestion des Événements**
 - Affichage des événements à venir
 - Moteur de recherche intégré
+- Pagination automatique
 - Cartes avec images et détails
-- Animations au survol
 
 </td>
 </tr>
 <tr>
 <td>
 
-**📝 Inscriptions**
-- Formulaire Aide aux Devoirs
-- Formulaire Bénévolat avec CV
-- Pré-remplissage automatique
-- Validation des données
+**📝 Inscriptions Aide aux Devoirs**
+- Formulaire complet (nom, prénom, classe, adresse, téléphone, email)
+- Pré-remplissage automatique pour les membres
+- Validation des données en temps réel
+- Confirmation visuelle après inscription
 
 </td>
 <td>
@@ -81,27 +83,96 @@ L'association **Aujourd'hui vers Demain** accompagne les habitants du quartier d
 
 </td>
 </tr>
+<tr>
+<td>
+
+**❤️ Bénévolat**
+- Formulaire de candidature complet
+- Upload de CV (PDF, Word, Images)
+- Champs disponibilités et compétences
+- Réservé aux membres connectés
+
+</td>
+<td>
+
+**📞 Contact**
+- Formulaire de contact sécurisé
+- Protection anti-spam
+- Informations de l'association
+- Carte interactive
+
+</td>
+</tr>
 </table>
 
 ### 🔧 Espace Administrateur (Back-Office)
 
 | Fonctionnalité | Description |
 |----------------|-------------|
-| 🔐 **Connexion sécurisée** | Authentification avec hachage bcrypt |
-| 📊 **Dashboard** | Vue d'ensemble des événements |
+| 🔐 **Connexion sécurisée** | Authentification avec hachage bcrypt + protection brute force |
+| 📊 **Dashboard** | Vue d'ensemble des événements avec statistiques |
 | ➕ **CRUD Événements** | Créer, modifier, supprimer avec upload d'images |
 | 🖼️ **Gestion Galerie** | Ajouter/supprimer des photos par catégorie |
 | 📬 **Messagerie** | Centralisation des demandes (contact, inscriptions, bénévolat) |
+| 📋 **Gestion Inscriptions** | Tableau des inscrits à l'aide aux devoirs |
+| ✏️ **Modification Inscriptions** | Éditer les informations des enfants inscrits |
+| 📥 **Export CSV/Excel** | Téléchargement des inscriptions avec mise en forme professionnelle |
+| 📄 **Génération PDF** | Reçus d'inscription personnalisés avec logo |
 | 🛡️ **Sécurité** | Logs de connexion et gestion des sessions |
+
+### 📊 Nouvelles Fonctionnalités Pro
+
+<table>
+<tr>
+<td width="33%" align="center">
+
+**📥 Export Excel**
+
+![Excel](https://img.shields.io/badge/PhpSpreadsheet-5.4-green?style=flat-square)
+
+Export formaté avec :
+- En-têtes colorés
+- Colonnes auto-ajustées
+- Alternance de couleurs
+
+</td>
+<td width="33%" align="center">
+
+**📄 Génération PDF**
+
+![TCPDF](https://img.shields.io/badge/TCPDF-6.10-red?style=flat-square)
+
+Reçus professionnels avec :
+- Logo de l'association
+- Informations complètes
+- Rappel des horaires
+
+</td>
+<td width="33%" align="center">
+
+**✏️ Gestion Complète**
+
+![CRUD](https://img.shields.io/badge/CRUD-Complet-blue?style=flat-square)
+
+Actions disponibles :
+- Modifier les inscriptions
+- Envoyer des emails
+- Supprimer les entrées
+
+</td>
+</tr>
+</table>
 
 ### 🛡️ Sécurité Implémentée
 
-- ✅ Protection CSRF sur les formulaires
-- ✅ Hachage des mots de passe (`password_hash`)
+- ✅ Protection CSRF sur tous les formulaires
+- ✅ Hachage des mots de passe (`password_hash` bcrypt)
 - ✅ Requêtes préparées (PDO) contre les injections SQL
-- ✅ Validation et échappement des données
-- ✅ Protection des uploads (types de fichiers autorisés)
+- ✅ Validation et échappement des données (`htmlspecialchars`)
+- ✅ Protection des uploads (types et tailles de fichiers)
 - ✅ Sessions sécurisées avec timeout
+- ✅ Limitation des tentatives de connexion
+- ✅ Protection des dossiers via `.htaccess`
 
 ---
 
@@ -117,7 +188,9 @@ L'association **Aujourd'hui vers Demain** accompagne les habitants du quartier d
 | **Framework CSS** | ![Bootstrap](https://img.shields.io/badge/Bootstrap_5.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white) |
 | **Icônes** | ![Bootstrap Icons](https://img.shields.io/badge/Bootstrap_Icons-7952B3?style=flat-square&logo=bootstrap&logoColor=white) |
 | **Animations** | ![AOS](https://img.shields.io/badge/AOS-Animate_On_Scroll-blue?style=flat-square) |
-| **Outils** | ![VS Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white) ![Laragon](https://img.shields.io/badge/Laragon-0E83CD?style=flat-square&logo=laragon&logoColor=white) ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) |
+| **PDF** | ![TCPDF](https://img.shields.io/badge/TCPDF-6.10.1-red?style=flat-square) |
+| **Excel** | ![PhpSpreadsheet](https://img.shields.io/badge/PhpSpreadsheet-5.4.0-green?style=flat-square) |
+| **Outils** | ![VS Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white) ![Laragon](https://img.shields.io/badge/Laragon-0E83CD?style=flat-square&logo=laragon&logoColor=white) ![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) ![Composer](https://img.shields.io/badge/Composer-885630?style=flat-square&logo=composer&logoColor=white) |
 
 </div>
 
@@ -129,6 +202,7 @@ L'association **Aujourd'hui vers Demain** accompagne les habitants du quartier d
 
 - PHP 8.0 ou supérieur
 - MySQL 5.7 ou supérieur
+- Composer (pour les dépendances)
 - Serveur local (Laragon, WAMP, XAMPP...)
 
 ### Étapes d'installation
@@ -139,6 +213,9 @@ git clone https://github.com/tanaa75/Aujourdhui-vers-demain-stage.git
 
 # 2. Accéder au dossier
 cd Aujourdhui-vers-demain-stage
+
+# 3. Installer les dépendances PHP
+composer install
 ```
 
 ### Configuration de la base de données
@@ -148,9 +225,9 @@ cd Aujourdhui-vers-demain-stage
    CREATE DATABASE asso_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
 
-2. **Importer les tables** : Exécutez le script SQL fourni ou créez les tables manuellement
+2. **Importer les tables** : Exécutez le script `database/schema.sql`
 
-3. **Configurer la connexion** dans `db.php` :
+3. **Configurer la connexion** dans `includes/db.php` :
    ```php
    $host = 'localhost';
    $dbname = 'asso_db';
@@ -163,8 +240,9 @@ cd Aujourdhui-vers-demain-stage
 | Page | URL | Identifiants |
 |------|-----|--------------|
 | 🏠 Site public | `http://localhost/aujourdhui-vers-demain/` | - |
-| 🔐 Connexion Admin | `http://localhost/aujourdhui-vers-demain/login.php` | `admin` / `admin123` |
-| 📊 Dashboard | `http://localhost/aujourdhui-vers-demain/admin_dashboard.php` | Connexion requise |
+| 🔐 Connexion Admin | `http://localhost/aujourdhui-vers-demain/auth/login.php` | `admin` / `admin123` |
+| 📊 Dashboard | `http://localhost/aujourdhui-vers-demain/admin/dashboard.php` | Connexion requise |
+| 📋 Inscriptions | `http://localhost/aujourdhui-vers-demain/admin/inscriptions.php` | Connexion requise |
 
 ---
 
@@ -172,38 +250,60 @@ cd Aujourdhui-vers-demain-stage
 
 ```
 aujourdhui-vers-demain/
-├── 📄 index.php              # Page d'accueil principale
-├── 📄 db.php                 # Configuration base de données
-├── 📄 navbar.php             # Barre de navigation
-├── 📄 footer.php             # Pied de page
 │
-├── 🌐 Pages Publiques
-│   ├── galerie.php           # Galerie photos dynamique
-│   ├── actions.php           # Nos actions (aide aux devoirs)
-│   ├── benevolat.php         # Devenir bénévole
-│   └── contact.php           # Formulaire de contact
+├── 📁 admin/                    # 🔧 Back-Office Administration
+│   ├── dashboard.php            # Gestion des événements
+│   ├── galerie.php              # Gestion galerie photos
+│   ├── messages.php             # Messagerie centralisée
+│   ├── inscriptions.php         # Liste des inscriptions aide aux devoirs
+│   ├── edit_inscription.php     # Modifier une inscription
+│   ├── export_inscriptions.php  # Export CSV & Excel
+│   └── generate_pdf.php         # Génération reçus PDF
 │
-├── 🔐 Authentification
-│   ├── login.php             # Connexion admin
-│   ├── inscription.php       # Inscription membre
-│   ├── connexion.php         # Connexion membre
-│   └── logout.php            # Déconnexion
+├── 📁 auth/                     # 🔐 Authentification
+│   ├── login.php                # Connexion admin
+│   ├── inscription.php          # Inscription membre
+│   ├── connexion.php            # Connexion membre
+│   └── logout.php               # Déconnexion
 │
-├── 🔧 Administration
-│   ├── admin_dashboard.php   # Gestion événements
-│   ├── admin_galerie.php     # Gestion galerie photos
-│   ├── admin_add_photo.php   # Ajout de photos
-│   ├── admin_messages.php    # Messagerie centralisée
-│   └── admin_security.php    # Logs de sécurité
+├── 📁 pages/                    # 🌐 Pages Publiques
+│   ├── actions.php              # Nos actions (aide aux devoirs)
+│   ├── galerie.php              # Galerie photos dynamique
+│   ├── benevolat.php            # Devenir bénévole
+│   └── contact.php              # Formulaire de contact
 │
-├── 🎨 Assets
-│   ├── mobile-responsive.css # Styles responsive
-│   ├── script_theme.js       # Gestion thème jour/nuit
-│   └── uploads/              # Images uploadées
+├── 📁 includes/                 # ⚙️ Fichiers partagés
+│   ├── db.php                   # Configuration BDD
+│   ├── navbar.php               # Barre de navigation
+│   ├── footer.php               # Pied de page
+│   ├── security.php             # Fonctions de sécurité (CSRF)
+│   └── config.php               # Configuration globale
 │
-└── 📋 Documentation
-    ├── README.md             # Ce fichier
-    └── .htaccess             # Configuration Apache
+├── 📁 assets/                   # 🎨 Ressources statiques
+│   ├── css/
+│   │   ├── index.css            # Styles page d'accueil
+│   │   ├── admin.css            # Styles administration
+│   │   └── mobile-responsive.css # Styles responsive
+│   └── js/
+│       ├── index.js             # Scripts page d'accueil
+│       └── script_theme.js      # Gestion thème jour/nuit
+│
+├── 📁 uploads/                  # 📤 Fichiers uploadés
+│   ├── events/                  # Images événements
+│   ├── gallery/                 # Photos galerie
+│   └── cv/                      # CV des bénévoles
+│
+├── 📁 vendor/                   # 📦 Dépendances Composer
+│   ├── phpoffice/phpspreadsheet # Export Excel
+│   └── tecnickcom/tcpdf         # Génération PDF
+│
+├── 📁 pages/legal/              # ⚖️ Pages légales
+│   ├── mentions.php             # Mentions légales
+│   └── confidentialite.php      # Politique de confidentialité
+│
+├── 📄 index.php                 # Page d'accueil principale
+├── 📄 composer.json             # Dépendances PHP
+└── 📄 README.md                 # Documentation
 ```
 
 ---
@@ -212,13 +312,23 @@ aujourdhui-vers-demain/
 
 <div align="center">
 
-| Page d'Accueil | Galerie Photos |
-|----------------|----------------|
-| ![Accueil](image_71fdc5.jpg) | *Ajoutez une capture* |
+### 🏠 Page d'Accueil
 
-| Admin Dashboard | Mode Sombre |
-|-----------------|-------------|
-| *Ajoutez une capture* | *Ajoutez une capture* |
+| Mode Clair | Mode Sombre |
+|------------|-------------|
+| ![Accueil Light](docs/screenshots/home_light.jpg) | ![Accueil Dark](docs/screenshots/home_dark.jpg) |
+
+### 🔧 Administration
+
+| Dashboard | Inscriptions |
+|-----------|--------------|
+| ![Dashboard](docs/screenshots/admin_dashboard.jpg) | ![Inscriptions](docs/screenshots/admin_inscriptions.jpg) |
+
+### 📊 Exports
+
+| Export Excel | Reçu PDF |
+|--------------|----------|
+| ![Excel](docs/screenshots/export_excel.jpg) | ![PDF](docs/screenshots/receipt_pdf.jpg) |
 
 </div>
 
@@ -233,7 +343,7 @@ erDiagram
     
     UTILISATEURS {
         int id PK
-        varchar email
+        varchar email UK
         varchar mot_de_passe
         datetime date_ajout
     }
@@ -241,7 +351,7 @@ erDiagram
     MEMBRES {
         int id PK
         varchar nom
-        varchar email
+        varchar email UK
         varchar mot_de_passe
         datetime date_inscription
     }
@@ -253,6 +363,7 @@ erDiagram
         date date_evenement
         varchar lieu
         varchar image
+        datetime created_at
     }
     
     PHOTOS {
@@ -270,8 +381,32 @@ erDiagram
         varchar email
         text message
         datetime date_envoi
+        boolean lu
     }
 ```
+
+---
+
+## 📦 Dépendances
+
+### Composer (PHP)
+
+```json
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.4",
+        "tecnickcom/tcpdf": "^6.10"
+    }
+}
+```
+
+### CDN (Front-End)
+
+| Librairie | Version | Usage |
+|-----------|---------|-------|
+| Bootstrap | 5.3.0 | Framework CSS |
+| Bootstrap Icons | 1.11.0 | Icônes |
+| AOS | 2.3.1 | Animations scroll |
 
 ---
 
@@ -279,10 +414,10 @@ erDiagram
 
 <div align="center">
 
-| Développeur | Rôle |
-|-------------|------|
-| **CA TANAVONG** | Développeur Full-Stack |
-| **BEDJOU AYOUB** | Développeur Full-Stack |
+| Développeur | Rôle | Contact |
+|-------------|------|---------|
+| **CA TANAVONG** | Développeur Full-Stack | [![GitHub](https://img.shields.io/badge/GitHub-tanaa75-181717?style=flat-square&logo=github)](https://github.com/tanaa75) |
+| **BEDJOU AYOUB** | Développeur Full-Stack | [![GitHub](https://img.shields.io/badge/GitHub-ayoub-181717?style=flat-square&logo=github)](https://github.com) |
 
 </div>
 
@@ -300,5 +435,6 @@ Tous droits réservés © 2026 - CA TANAVONG & BEDJOU AYOUB
 **⭐ Si ce projet vous a plu, n'hésitez pas à lui donner une étoile !**
 
 [![Made with ❤️](https://img.shields.io/badge/Made%20with-❤️-red?style=for-the-badge)](https://github.com/tanaa75)
+[![Maintained](https://img.shields.io/badge/Maintained-Yes-green?style=for-the-badge)](https://github.com/tanaa75)
 
 </div>

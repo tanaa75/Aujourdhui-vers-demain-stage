@@ -61,6 +61,7 @@ require_once __DIR__ . '/config.php';
                 <ul class="dropdown-menu dropdown-menu-end shadow">
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/dashboard.php"><i class="bi bi-calendar-event me-2"></i>Gérer événements</a></li>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/galerie.php"><i class="bi bi-images me-2"></i>Gérer Galerie</a></li>
+                    <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/inscriptions.php"><i class="bi bi-journal-check me-2"></i>Inscriptions Devoirs</a></li>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/messages.php"><i class="bi bi-inbox-fill me-2"></i>Messagerie</a></li>
                     <li><a class="dropdown-item" href="<?= BASE_URL ?>admin/security.php"><i class="bi bi-shield-lock-fill me-2"></i>Sécurité</a></li>
                     <li><hr class="dropdown-divider"></li>

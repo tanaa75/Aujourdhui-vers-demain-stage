@@ -86,6 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
             $classe = sanitize_input($_POST['classe']);
             $tel = sanitize_input($_POST['tel']);
             $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            $adresse = sanitize_input($_POST['adresse']);
             
             // Validation de l'email
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -94,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $est_c
                 $error_msg = "Numéro de téléphone invalide.";
             } else {
                 // Construction du message formaté
-                $msg = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nTéléphone : $tel\nEmail parent : $email";
+                $msg = "🔔 INSCRIPTION AIDE AUX DEVOIRS\n\nEnfant : $nom $prenom\nClasse : $classe\nAdresse : $adresse\nTéléphone : $tel\nEmail parent : $email";
                 
                 // Insertion en base de données
                 $stmt = $pdo->prepare("INSERT INTO messages (nom, email, message) VALUES (?, ?, ?)");
@@ -388,6 +389,7 @@ $total_pages = ceil($total_events / $events_per_page);
                                     <div class="col-6 mb-3"><label>Prénom</label><input type="text" name="prenom" class="form-control" required></div>
                                 </div>
                                 <div class="mb-3"><label>Email parent</label><input type="email" name="email" class="form-control" value="<?= htmlspecialchars($email_user) ?>" required></div>
+                                <div class="mb-3"><label>Adresse</label><input type="text" name="adresse" class="form-control" placeholder="Ex: 12 rue de la Paix, 93000 Bobigny" required></div>
                                 <div class="row">
                                     <div class="col-6 mb-3"><label>Classe</label><input type="text" name="classe" class="form-control" placeholder="Ex: CM1" required></div>
                                     <div class="col-6 mb-3"><label>Téléphone</label><input type="tel" name="tel" class="form-control" required></div>
